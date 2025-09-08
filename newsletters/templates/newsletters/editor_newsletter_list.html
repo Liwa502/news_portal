@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Newsletters for Review</h2>
+
+<ul class="list-group">
+  {% for newsletter in newsletters %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <span>{{ newsletter.title }}</span>
+      <span>
+        <a href="{% url 'newsletters:editor_edit' newsletter.pk %}" class="btn btn-sm btn-warning">Edit/Approve</a>
+      </span>
+    </li>
+  {% empty %}
+    <li class="list-group-item">No newsletters to review.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

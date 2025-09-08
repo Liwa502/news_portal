@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>My Articles</h2>
+<a href="{% url 'articles:journalist_create' %}" class="btn btn-primary mb-3">Create New Article</a>
+
+<ul class="list-group">
+  {% for article in articles %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <span>{{ article.title }}</span>
+      <span>
+        <a href="{% url 'articles:journalist_edit' article.pk %}" class="btn btn-sm btn-warning">Edit</a>
+        <form action="{% url 'articles:journalist_delete' article.pk %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+        </form>
+      </span>
+    </li>
+  {% empty %}
+    <li class="list-group-item">No articles yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,327 @@
+# Django Capstone — System Design
+
+> Comprehensive design artefacts for the Capstone project: models, ERD, class diagrams (described), sequence flows, UI wireframes, API design, permissions, signals vs non-signals options, unit test plan, and MariaDB migration notes.
+
+---
+
+## 1. Requirements
+
+### Functional requirements
+
+* User authentication and custom user model with roles: **Reader**, **Editor**, **Journalist**.
+* Readers can subscribe to **Publishers** and **Journalists**.
+* Journalists can create articles and newsletters, mark draft/published.
+* Editors can view, update, delete, and **approve** articles/newsletters.
+* Approval triggers delivery: email to subscribers and optional posting to X (Twitter) via API.
+* RESTful API endpoints for third-party clients to retrieve articles based on subscriptions.
+* Frontend UI for login, dashboards (Reader/Journalist/Editor), article creation/review, and subscription management.
+* Role-based access control enforcing group permissions.
+
+### Non-functional requirements
+
+* Database: MariaDB (normalized tables, referential integrity).
+* Security: use Django auth, permissions, CSRF, validation, rate limiting for API endpoints.
+* Performance: paginate API responses; index lookup fields (publisher\_id, author\_id, published\_at).
+* Maintainability: modular apps (accounts, articles, publishers, api), clear tests and CI.
+* Deliverability: email sending via SMTP (or service), environment configuration via `.env`.
+
+---
+
+## 2. High-level architecture
+
+* Django project split into apps:
+
+  * `accounts` (custom user, groups/permissions, auth views)
+  * `publishers` (Publisher model, relations)
+  * `articles` (Article, Newsletter, Subscriptions)
+  * `api` (DRF serializers, views, urls)
+  * `notifications` (signals or helper functions for email/X)
+
+---
+
+## 3. Data model (normalized)
+
+### Core models and fields (suggested)
+
+#### `CustomUser` (accounts.models.CustomUser)
+
+* `username`, `email`, `first_name`, `last_name` (from AbstractUser)
+* `role` (choices: reader, editor, journalist)
+* `subscriptions_publishers` (M2M to Publisher, nullable for journalist)
+* `subscriptions_journalists` (M2M to CustomUser limited to role=journalist)
+* `journalist_articles` (reverse FK from Article)
+* `journalist_newsletters` (reverse FK from Newsletter)
+* Additional: `bio`, `profile_image` (optional)
+
+> Business rule: For users with role `journalist`, reader-specific subscription fields are null/empty; for `reader`, journalist-specific authored fields are not used.
+
+#### `Publisher` (publishers.models.Publisher)
+
+* `id`, `name`, `description`, `website`, `created_at`
+* `editors` (M2M to CustomUser limited to role=editor)
+* `journalists` (M2M to CustomUser limited to role=journalist)
+
+#### `Article` (articles.models.Article)
+
+* `id`, `title`, `slug`, `summary`, `content` (TextField)
+* `author` (FK → CustomUser, nullable=False; author.role should be journalist)
+* `publisher` (FK → Publisher)
+* `status` (choices: draft, pending\_review, approved, published, rejected)
+* `approved_by` (FK → CustomUser, nullable, role=editor)
+* `approved_at` (DateTimeField, nullable)
+* `is_published` (BooleanField; derived or explicit)
+* `published_at` (DateTimeField, nullable)
+* `created_at`, `updated_at`
+
+#### `Newsletter` (articles.models.Newsletter)
+
+* similar to Article but usually shorter and intended for email
+* `author` (FK → CustomUser)
+* `publisher` (FK → Publisher, nullable)
+* `status`, `approved_by`, `approved_at`
+
+#### `Subscription` (articles.models.Subscription) — optional explicit join table
+
+* `id`, `user` (FK → CustomUser)
+* `publisher` (FK → Publisher, nullable)
+* `journalist` (FK → CustomUser, nullable)
+* unique constraint: (user, publisher) and (user, journalist) to avoid dupes
+
+> I recommend an explicit Subscription model for easier querying and history.
+
+---
+
+## 4. ERD (textual)
+
+* `CustomUser` 1—\* `Article` (author)
+* `Publisher` 1—\* `Article`
+* `Publisher` *—* `CustomUser` (editors) via `publisher_editors` M2M
+* `Publisher` *—* `CustomUser` (journalists) via `publisher_journalists` M2M
+* `CustomUser` *—* `Publisher` via `Subscription`
+* `CustomUser` *—* `CustomUser` via `Subscription` (for journalist subscriptions)
+
+Indexes: add index on `Article(publisher_id)`, `Article(author_id)`, `Article(status, published_at)`.
+
+---
+
+## 5. Class diagram (summary)
+
+* `CustomUser` extends `AbstractUser`
+* `Publisher` contains m2m to `CustomUser` (editors, journalists)
+* `Article` has FK to `CustomUser` and `Publisher`
+* `Newsletter` similar to `Article`
+* `Subscription` links `CustomUser` → `Publisher`/`CustomUser`
+
+(Include actual diagram images in your submission if required; here we provided a textual mapping.)
+
+---
+
+## 6. Key sequence flows (describe; include in submission as diagrams)
+
+### Flow A — Journalist submits article
+
+1. Journalist fills article form and submits (`status=draft` or `pending_review`).
+2. Saves Article instance with `author=journalist`, `publisher` assigned.
+3. System routes to author dashboard.
+
+### Flow B — Editor reviews and approves article
+
+1. Editor opens review UI and clicks `Approve`.
+2. View verifies permission (`request.user` in publisher.editors or `is_staff` and group editor).
+3. Update `Article.status='approved'`, set `approved_by`, `approved_at`, `is_published=True`, `published_at=now()`.
+   4a. If using **signals**: `post_save` or a custom `article_approved` signal triggers handlers to:
+
+   * Send emails to subscribers (publisher subscribers + author’s subscribers).
+   * Post to X via HTTP API (if configured).
+     4b. If **not using signals**: the same actions are executed directly in the view after status update.
+
+### Flow C — Reader subscribes to Publisher/Journalist
+
+1. Reader clicks `Subscribe` on publisher or journalist page.
+2. System creates `Subscription(user, publisher)` or `Subscription(user, journalist)`.
+3. Reader receives confirmation email (optional).
+
+---
+
+## 7. UI/UX wireframes
+
+### Pages to design
+
+* **Landing / Home**: list latest approved articles; filters by publisher, journalist; search bar.
+* **Article Detail**: title, author, publisher, publish date, share buttons (email/X), subscribe to journalist/publisher.
+* **Login / Register**: role selection for registration (default reader).
+* **Reader Dashboard**: personalized feed (based on subscriptions), subscription management.
+* **Journalist Dashboard**: create article, list drafts/pending/approved, view metrics.
+* **Editor Dashboard**: list pending articles for publishers they manage; review UI with approve/reject buttons.
+* **Publisher Admin**: manage editors & journalists (M2M UI)
+
+---
+
+## 8. Permissions & Groups
+
+Create Django groups: `Reader`, `Editor`, `Journalist`.
+
+Permissions mapping (Django-style):
+
+* `Reader` group: `view_article`, `view_newsletter`.
+* `Journalist` group: `add_article`, `change_article`, `delete_article`, `view_article`, `add_newsletter`, `change_newsletter`, `delete_newsletter`.
+* `Editor` group: `change_article`, `delete_article`, `view_article`, `change_newsletter`, `delete_newsletter`, `view_newsletter`, plus a custom permission `can_approve_article`.
+
+Implementation notes:
+
+* Assign groups during `CustomUser` creation or in `post_save` of user.
+* Use `@permission_required` or `user.has_perm('app.can_approve_article')` to protect views.
+* Additional check: verify editor belongs to the relevant `Publisher.editors` for that article.
+
+---
+
+## 9. Signals vs Non-Signals — implementation options
+
+### Option 1: Using Django signals (recommended for separation of concerns)
+
+* Define a custom signal `article_approved` and send it in `Article.approve()` method or `post_save` when status transitions to `approved`.
+* Handlers:
+
+  * `send_email_to_subscribers(article)` — builds subscription list, renders email template, sends via Django `send_mass_mail` or external service.
+  * `post_to_x(article)` — uses `requests` to call X API and post content.
+
+### Option 2: No signals — perform in view
+
+* After updating article to `approved` in the view, call `send_email_to_subscribers()` and `post_to_x()` directly.
+
+---
+
+## 10. RESTful API design (DRF)
+
+### Endpoints (examples)
+
+* `GET /api/articles/` — list articles; filter by `publisher`, `journalist`, `status=published`.
+* `GET /api/articles/<id>/` — retrieve article detail.
+* `GET /api/publishers/<id>/articles/` — articles for a publisher.
+* `GET /api/journalists/<id>/articles/` — articles for a journalist.
+* `POST /api/subscriptions/` — (for API clients) subscribe to publisher/journalist (auth required)
+
+### Serializers
+
+* `ArticleSerializer` — fields: id, title, slug, summary, content (optional), author (nested), publisher (nested), published\_at
+* `PublisherSerializer` — id, name, description
+* `UserSerializer` (for journalist info) — id, username, display\_name
+
+### Views
+
+* Use `GenericAPIView`/`ListAPIView` with filters and pagination.
+* Use permission classes: `IsAuthenticatedOrReadOnly` for certain endpoints.
+
+### Subscription-based retrieval
+
+* API client should authenticate (token/session) and the API will return articles based on `user` subscriptions.
+* Alternatively, support query params `?subscriber_id=123` (but prefer auth-based retrieval for privacy).
+
+---
+
+## 11. Unit testing plan
+
+* **Model tests**: creation, string reprs, status transitions (`pending_review` → `approved` sets `approved_by` and timestamps).
+* **Permissions tests**: ensure readers cannot approve; editors can approve only for publishers they manage.
+* **Signal / handler tests**: mock email sending and HTTP requests to X; assert handlers called with expected recipients.
+* **API tests**: endpoint returns expected articles for authenticated subscriber; pagination and filtering work.
+* Use `APITestCase` from DRF for API tests.
+
+---
+
+## 12. MariaDB migration notes
+
+* Add `mysqlclient` to requirements and configure `DATABASES` in `settings.py`:
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'HOST': env('DB_HOST', 'localhost'),
+        'PORT': env('DB_PORT', '3306'),
+        'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"},
+    }
+}
+```
+
+---
+
+## 13. Example Django models (starter code)
+
+```python
+# accounts/models.py
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
+class CustomUser(AbstractUser):
+    ROLE_CHOICES = (("reader","Reader"),("editor","Editor"),("journalist","Journalist"))
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    bio = models.TextField(blank=True, null=True)
+    subscriptions_publishers = models.ManyToManyField('publishers.Publisher', through='articles.Subscription', blank=True)
+    subscriptions_journalists = models.ManyToManyField('self', through='articles.Subscription', symmetrical=False, blank=True)
+
+# publishers/models.py
+from django.db import models
+class Publisher(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    editors = models.ManyToManyField('accounts.CustomUser', related_name='publisher_editor_for', blank=True)
+    journalists = models.ManyToManyField('accounts.CustomUser', related_name='publisher_journalist_for', blank=True)
+
+# articles/models.py
+from django.db import models
+class Article(models.Model):
+    STATUS = (("draft","Draft"),("pending","Pending Review"),("approved","Approved"),("published","Published"),("rejected","Rejected"))
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True)
+    author = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE)
+    publisher = models.ForeignKey('publishers.Publisher', on_delete=models.CASCADE)
+    content = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS, default='draft')
+    approved_by = models.ForeignKey('accounts.CustomUser', null=True, blank=True, related_name='approved_articles', on_delete=models.SET_NULL)
+    approved_at = models.DateTimeField(null=True, blank=True)
+    published_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class Subscription(models.Model):
+    user = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE)
+    publisher = models.ForeignKey('publishers.Publisher', null=True, blank=True, on_delete=models.CASCADE)
+    journalist = models.ForeignKey('accounts.CustomUser', null=True, blank=True, related_name='subscribers_for', on_delete=models.CASCADE)
+    class Meta:
+        unique_together = (('user','publisher'),('user','journalist'))
+
+```
+
+---
+
+## 14. Implementation checklist (step-by-step)
+
+1. Create project & apps: `accounts`, `publishers`, `articles`, `api`, `notifications`.
+2. Implement `CustomUser` and set `AUTH_USER_MODEL`.
+3. Implement `Publisher`, `Article`, `Newsletter`, `Subscription` models.
+4. Create migrations and migrate locally (SQLite), then test with MariaDB migration checklist.
+5. Seed groups and permissions in a data migration or startup script.
+6. Create CRUD views and templates for roles; implement forms.
+7. Implement approval flow and pick signals vs view approach.
+8. Implement notifications (email + X API).
+9. Build DRF serializers and API views; add authentication (Token or JWT).
+10. Write unit tests and API tests.
+11. Prepare Postman collection and screenshots.
+12. Finalize UI styling and responsive design.
+
+---
+
+## 15. Deliverables to include with submission
+
+* UML diagrams: Use case, class diagram, sequence diagrams
+* Wireframes/screenshots of UI.
+* `models.py` files, `views.py`, `serializers.py`, `urls.py`.
+* Test suite and Postman collection/screenshots.
+* `requirements.txt` and instructions to configure MariaDB.
+
+---
+

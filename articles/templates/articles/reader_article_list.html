@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Articles</h1>
+
+{% if articles %}
+    <ul>
+    {% for article in articles %}
+        <li>
+            <h2>{{ article.title }}</h2>
+            <p>{{ article.content|truncatewords:50 }}</p>
+            <p><small>Published on {{ article.published_date }}</small></p>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No articles found.</p>
+{% endif %}
+
+{% endblock %}

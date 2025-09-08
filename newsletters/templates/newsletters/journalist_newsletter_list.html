@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>My Newsletters</h2>
+<a href="{% url 'newsletters:journalist_create' %}" class="btn btn-primary mb-3">Create New Newsletter</a>
+
+<ul class="list-group">
+  {% for newsletter in newsletters %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <span>{{ newsletter.title }}</span>
+      <span>
+        <a href="{% url 'newsletters:journalist_edit' newsletter.pk %}" class="btn btn-sm btn-warning">Edit</a>
+        <form action="{% url 'newsletters:journalist_delete' newsletter.pk %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+        </form>
+      </span>
+    </li>
+  {% empty %}
+    <li class="list-group-item">No newsletters yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Journalist Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f5f9ff; padding: 20px; }
+    header, footer { background: white; padding: 15px; text-align: center; border: 1px solid lightblue; }
+    .card { margin-bottom: 15px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Journalist Dashboard</h1>
+    <a href="{% url 'articles:home' %}" class="btn btn-primary btn-sm mt-2">Home</a>
+    <a href="{% url 'accounts:logout' %}" class="btn btn-danger btn-sm mt-2">Logout</a>
+  </header>
+
+  <div class="container mt-4">
+    <h3>Your Articles</h3>
+    <a href="{% url 'articles:journalist_create' %}" class="btn btn-success mb-3">Create New Article</a>
+    <div class="row">
+      {% for article in articles %}
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ article.title }}</h5>
+              {% if article.is_approved %}
+                <span class="badge bg-success">Approved</span>
+              {% else %}
+                <span class="badge bg-warning">Pending</span>
+              {% endif %}
+              <a href="{% url 'articles:journalist_edit' article.pk %}" class="btn btn-sm btn-outline-primary mt-2">Edit</a>
+              <a href="{% url 'articles:journalist_delete' article.pk %}" class="btn btn-sm btn-outline-danger mt-2">Delete</a>
+              <a href="{% url 'articles:article_detail' article.pk %}" class="btn btn-sm btn-outline-secondary mt-2">View</a>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-muted">No articles submitted yet.</p>
+      {% endfor %}
+    </div>
+
+    <h3 class="mt-5">Your Newsletters</h3>
+    <a href="{% url 'newsletters:journalist_create' %}" class="btn btn-success mb-3">Create New Newsletter</a>
+    <div class="row">
+      {% for newsletter in newsletters %}
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ newsletter.title }}</h5>
+              {% if newsletter.is_approved %}
+                <span class="badge bg-success">Approved</span>
+              {% else %}
+                <span class="badge bg-warning">Pending</span>
+              {% endif %}
+              <a href="{% url 'newsletters:editors_edit' newsletter.pk %}" class="btn btn-sm btn-outline-primary mt-2">Edit</a>
+              <a href="{% url 'newsletters:journalist_delete' newsletter.pk %}" class="btn btn-sm btn-outline-danger mt-2">Delete</a>
+              <a href="{% url 'newsletters:newsletter_detail' newsletter.pk %}" class="btn btn-sm btn-outline-secondary mt-2">View</a>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-muted">No newsletters submitted yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 News Portal</p>
+  </footer>
+</body>
+</html>

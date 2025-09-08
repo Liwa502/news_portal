@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Newsletter{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Edit Newsletter: {{ newsletter.title }}</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <!-- Title -->
+        <div class="mb-3">
+            {{ form.title.label_tag }}
+            {{ form.title }}
+            {{ form.title.errors }}
+        </div>
+
+        <!-- Content -->
+        <div class="mb-3">
+            {{ form.content.label_tag }}
+            {{ form.content }}
+            {{ form.content.errors }}
+        </div>
+
+        <!-- Publisher dropdown -->
+        <div class="mb-3">
+            {{ form.publisher.label_tag }}
+            {{ form.publisher }}
+            {{ form.publisher.errors }}
+        </div>
+
+        <!-- Author dropdown -->
+        <div class="mb-3">
+            {{ form.author.label_tag }}
+            {{ form.author }}
+            {{ form.author.errors }}
+        </div>
+
+        <!-- Approved checkbox -->
+        <div class="form-check mb-3">
+            {{ form.is_approved }}
+            {{ form.is_approved.label_tag }}
+        </div>
+
+        <!-- Buttons -->
+        <button type="submit" name="save" class="btn btn-primary">Save Changes</button>
+        <button type="submit" name="approve" class="btn btn-success">Approve</button>
+        <a href="{% url 'newsletters:editor_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

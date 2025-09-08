@@ -1,0 +1,20 @@
+[flake8]
+# Maximum line length to match Black's default formatting
+max-line-length = 88
+
+# Ignore specific warnings
+# E203 - whitespace before ':', handled by Black
+# W503 - line break before binary operator, handled by Black
+# F401 - imported but unused (can ignore in migrations/tests if needed)
+ignore = E203, W503
+
+# Exclude certain directories from checks
+exclude =
+    .git,
+    __pycache__,
+    venv,
+    migrations,
+    node_modules
+
+# Enable showing complex issues
+select = B,C,E,F,W,T4,B9

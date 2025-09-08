@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Newsletters</h1>
+
+{% if newsletters %}
+    <ul class="list-group">
+    {% for newsletter in newsletters %}
+        <li class="list-group-item mb-2">
+            <h2>{{ newsletter.title }}</h2>
+            <p>{{ newsletter.content|truncatewords:50 }}</p>
+            <p><small>Published on {{ newsletter.published_date }}</small></p>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No newsletters found.</p>
+{% endif %}
+
+{% endblock %}
