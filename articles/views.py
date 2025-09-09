@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from newsletters.models import Newsletter
 from subscriptions.models import Subscription
 
-from .forms import ArticleForm
+from .forms import ArticleForm, PublisherForm
 from .models import Article, Journalist, Publisher
 
 """
@@ -102,6 +102,30 @@ def home(request):
         },
     )
 
+# ---------------------------- Editor + Journalist View ----------------------------
+
+@login_required
+def create_publisher(request):
+    """
+    Allow editors or journalists to create a new publisher.
+    """
+    if request.user.role not in ["editor", "journalist"]:
+        raise PermissionDenied()
+
+    if request.method == "POST":
+        form = PublisherForm(request.POST)
+        if form.is_valid():
+            publisher = form.save()
+            # Ensure the current user is added automatically
+            if request.user.role == "editor":
+                publisher.editors.add(request.user)
+            elif request.user.role == "journalist":
+                publisher.journalists.add(request.user)
+            publisher.save()
+            return redirect("articles:home")
+    else:
+        form = PublisherForm()
+    return render(request, "articles/publisher_form.html", {"form": form})
 
 # ---------------------------- Editor Views ----------------------------
 
@@ -116,6 +140,23 @@ def editor_article_list(request):
         raise PermissionDenied()
     articles = Article.objects.all().order_by("-created_at")
     return render(request, "articles/editor_article_list.html", {"articles": articles})
+
+@login_required
+def editor_article_delete(request, pk):
+    """
+    Allow an editor to delete any article.
+    """
+    if not request.user.is_authenticated or request.user.role != "editor":
+        raise PermissionDenied()
+    article = get_object_or_404(Article, pk=pk)
+    if request.method == "POST":
+        article.delete()
+        return redirect("articles:editor_list")
+    return render(
+        request,
+        "articles/article_confirm_delete.html",
+        {"article": article},
+    )
 
 
 def editor_article_edit(request, pk):

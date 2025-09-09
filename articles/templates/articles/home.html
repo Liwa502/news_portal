@@ -34,20 +34,9 @@
     }
     .subscribe-btn {
       font-size: 0.8rem;
-      margin-left: 5px;
-      margin-top: 3px;
     }
     .list-group-item {
-      position: relative;
-    }
-    .btn-subscribe-container {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 3px;
+      /* no position absolute here */
     }
   </style>
 </head>
@@ -95,34 +84,40 @@
       <h4 class="mb-3">Articles</h4>
       <div class="list-group mb-4">
         {% for article in articles %}
-          <div class="list-group-item">
-            <a href="{% if user.role == 'reader' %}{% url 'articles:article_detail' article.pk %}{% else %}#{% endif %}">
-              <h5 class="mb-1">{{ article.title }}</h5>
-            </a>
-            <small>By {{ article.author.username }}
-              {% if article.publisher %}| {{ article.publisher.name }}{% endif %}
-            </small>
+          <div class="list-group-item d-flex justify-content-between align-items-start">
+            <div>
+              <a href="{% if user.role == 'reader' %}{% url 'articles:article_detail' article.pk %}{% else %}#{% endif %}">
+                <h5 class="mb-1">{{ article.title }}</h5>
+              </a>
+              <small>By {{ article.author.username }}
+                {% if article.publisher %}| {{ article.publisher.name }}{% endif %}
+              </small>
+            </div>
 
-            {% if user.role == 'editor' %}
-              {% if article.is_approved %}
-                <span class="badge bg-success float-end">Approved</span>
-              {% else %}
-                <span class="badge bg-danger float-end">Unapproved</span>
-              {% endif %}
-            {% elif user.role == 'reader' %}
-              <div class="btn-subscribe-container">
-                {% if article.publisher and article.publisher.id in subscribed_publishers %}
-                  <a href="{% url 'subscriptions:publisher_unsubscribe' article.publisher.pk %}" class="btn btn-sm btn-outline-danger subscribe-btn">Unsubscribe Publisher</a>
-                {% elif article.publisher %}
-                  <a href="{% url 'subscriptions:publisher_subscribe' article.publisher.pk %}" class="btn btn-sm btn-primary subscribe-btn">Subscribe Publisher</a>
+            {% if user.role == 'reader' %}
+              <div class="d-flex flex-column gap-2">
+                {% if article.publisher %}
+                  {% if article.publisher.id in subscribed_publishers %}
+                    <a href="{% url 'subscriptions:publisher_unsubscribe' article.publisher.pk %}" class="btn btn-sm btn-outline-danger">Unsubscribe Publisher</a>
+                  {% else %}
+                    <a href="{% url 'subscriptions:publisher_subscribe' article.publisher.pk %}" class="btn btn-sm btn-primary">Subscribe Publisher</a>
+                  {% endif %}
                 {% endif %}
 
-                {% if article.author and article.author.id in subscribed_journalists %}
-                  <a href="{% url 'subscriptions:journalist_subscribe' article.author.pk %}" class="btn btn-sm btn-outline-warning subscribe-btn">Unsubscribe Journalist</a>
-                {% elif article.author %}
-                  <a href="{% url 'subscriptions:journalist_unsubscribe' article.author.pk %}" class="btn btn-sm btn-warning subscribe-btn">Subscribe Journalist</a>
+                {% if article.author %}
+                  {% if article.author.id in subscribed_journalists %}
+                    <a href="{% url 'subscriptions:journalist_unsubscribe' article.author.pk %}" class="btn btn-sm btn-outline-warning">Unsubscribe Journalist</a>
+                  {% else %}
+                    <a href="{% url 'subscriptions:journalist_subscribe' article.author.pk %}" class="btn btn-sm btn-warning">Subscribe Journalist</a>
+                  {% endif %}
                 {% endif %}
               </div>
+            {% elif user.role == 'editor' %}
+              {% if article.is_approved %}
+                <span class="badge bg-success">Approved</span>
+              {% else %}
+                <span class="badge bg-danger">Unapproved</span>
+              {% endif %}
             {% endif %}
           </div>
         {% endfor %}
@@ -133,26 +128,32 @@
       <h4 class="mb-3">Newsletters</h4>
       <div class="list-group mb-4">
         {% for newsletter in newsletters %}
-          <div class="list-group-item">
-            <a href="{% if user.role == 'reader' %}{% url 'newsletters:newsletter_detail' newsletter.pk %}{% else %}#{% endif %}">
-              <h5 class="mb-1">{{ newsletter.title }}</h5>
-            </a>
-            <small>By {{ newsletter.author.username }}
-              {% if newsletter.publisher %}| {{ newsletter.publisher.name }}{% endif %}
-            </small>
+          <div class="list-group-item d-flex justify-content-between align-items-start">
+            <div>
+              <a href="{% if user.role == 'reader' %}{% url 'newsletters:reader_detail' newsletter.pk %}{% else %}#{% endif %}">
+                <h5 class="mb-1">{{ newsletter.title }}</h5>
+              </a>
+              <small>By {{ newsletter.author.username }}
+                {% if newsletter.publisher %}| {{ newsletter.publisher.name }}{% endif %}
+              </small>
+            </div>
 
             {% if user.role == 'reader' %}
-              <div class="btn-subscribe-container">
-                {% if newsletter.publisher and newsletter.publisher.id in subscribed_publishers %}
-                  <a href="{% url 'subscriptions:publisher_unsubscriber' newsletter.publisher.pk %}" class="btn btn-sm btn-outline-danger subscribe-btn">Unsubscribe Publisher</a>
-                {% elif newsletter.publisher %}
-                  <a href="{% url 'subscriptions:publisher_subscribe' newsletter.publisher.pk %}" class="btn btn-sm btn-primary subscribe-btn">Subscribe Publisher</a>
+              <div class="d-flex flex-column gap-2">
+                {% if newsletter.publisher %}
+                  {% if newsletter.publisher.id in subscribed_publishers %}
+                    <a href="{% url 'subscriptions:publisher_unsubscriber' newsletter.publisher.pk %}" class="btn btn-sm btn-outline-danger">Unsubscribe Publisher</a>
+                  {% else %}
+                    <a href="{% url 'subscriptions:publisher_subscriber' newsletter.publisher.pk %}" class="btn btn-sm btn-primary">Subscribe Publisher</a>
+                  {% endif %}
                 {% endif %}
 
-                {% if newsletter.author and newsletter.author.id in subscribed_journalists %}
-                  <a href="{% url 'subscriptions:journalist_unsubscribe' newsletter.author.pk %}" class="btn btn-sm btn-outline-warning subscribe-btn">Unsubscribe Journalist</a>
-                {% elif newsletter.author %}
-                  <a href="{% url 'subscriptions:journalist_subscribe' newsletter.author.pk %}" class="btn btn-sm btn-warning subscribe-btn">Subscribe Journalist</a>
+                {% if newsletter.author %}
+                  {% if newsletter.author.id in subscribed_journalists %}
+                    <a href="{% url 'subscriptions:journalist_unsubscriber' newsletter.author.pk %}" class="btn btn-sm btn-outline-warning">Unsubscribe Journalist</a>
+                  {% else %}
+                    <a href="{% url 'subscriptions:journalist_subscriber' newsletter.author.pk %}" class="btn btn-sm btn-warning">Subscribe Journalist</a>
+                  {% endif %}
                 {% endif %}
               </div>
             {% endif %}
@@ -172,9 +173,9 @@
               <div class="list-group-item d-flex justify-content-between align-items-center">
                 {{ publisher.name }}
                 {% if publisher.id in subscribed_publishers %}
-                  <a href="{% url 'subscriptions:journalist_subscribe' publisher.pk %}" class="btn btn-sm btn-outline-danger">Unsubscribe</a>
+                  <a href="{% url 'subscriptions:publisher_unsubscriber' publisher.pk %}" class="btn btn-sm btn-outline-danger">Unsubscribe</a>
                 {% else %}
-                  <a href="{% url 'subscriptions:publisher_subscribe' publisher.pk %}" class="btn btn-sm btn-primary">Subscribe</a>
+                  <a href="{% url 'subscriptions:publisher_subscriber' publisher.pk %}" class="btn btn-sm btn-primary">Subscribe</a>
                 {% endif %}
               </div>
             {% endfor %}
@@ -190,9 +191,9 @@
               <div class="list-group-item d-flex justify-content-between align-items-center">
                 {{ journalist.user.username }}
                 {% if journalist.user.id in subscribed_journalists %}
-                  <a href="{% url 'subscriptions:journalist_unsubscribe' journalist.user.pk %}" class="btn btn-sm btn-outline-warning">Unsubscribe</a>
+                  <a href="{% url 'subscriptions:journalist_unsubscriber' journalist.user.pk %}" class="btn btn-sm btn-outline-warning">Unsubscribe</a>
                 {% else %}
-                  <a href="{% url 'subscriptions:journalist_subscribe' journalist.user.pk %}" class="btn btn-sm btn-warning">Subscribe</a>
+                  <a href="{% url 'subscriptions:journalist_subscriber' journalist.user.pk %}" class="btn btn-sm btn-warning">Subscribe</a>
                 {% endif %}
               </div>
             {% endfor %}

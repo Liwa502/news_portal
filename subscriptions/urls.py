@@ -15,22 +15,22 @@ urlpatterns = [
     path(
         "publisher/<int:pk>/subscribe/",
         views.subscribe_publisher,
-        name="publisher_subscribe",
+        name="publisher_subscriber",
     ),
     path(
         "publisher/<int:pk>/unsubscribe/",
         views.unsubscribe_publisher,
-        name="publisher_unsubscribe",
+        name="publisher_unsubscriber",
     ),
     # Journalist subscription URLs
     path(
         "journalist/<int:pk>/subscribe/",
         views.subscribe_journalist,
-        name="journalist_subscribe",
+        name="journalist_subscriber",
     ),
     path(
         "journalist/<int:pk>/unsubscribe/",
         views.unsubscribe_journalist,
-        name="journalist_unsubscribe",
+        name="journalist_unsubscriber",
     ),
 ]

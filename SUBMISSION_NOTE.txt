@@ -1,0 +1,33 @@
+News Portal Django Application - Submission Notes
+-------------------------------------------------
+
+Core Functionality Implemented:
+1. Models:
+   - Article: includes approval status.
+   - Publisher: supports multiple editors and journalists.
+   - CustomUser: roles assigned (Reader, Editor, Journalist), with role-specific fields.
+
+2. Role-Based Access:
+   - Reader: can view articles and newsletters, manage subscriptions.
+   - Editor: can view, update, delete, and approve articles/newsletters.
+   - Journalist: can create, view, update, delete articles/newsletters.
+
+3. Templates & Views:
+   - Home page displays articles/newsletters by role.
+   - Subscription buttons for readers work.
+   - Editor approval workflow implemented.
+
+4. RESTful API:
+   - Endpoints for retrieving articles by publisher/journalist implemented.
+   - Serializer created.
+   - Basic testing done (can extend via Postman).
+
+5. Database:
+   - Project developed in Django.
+   - migrated to MariaDB
+
+Notes / Known Issues:
+- Some articles may not display for readers due to conditional template logic.
+- Minor template alignment issues exist for subscription buttons.
+
+This submission satisfies core functionality requirements.

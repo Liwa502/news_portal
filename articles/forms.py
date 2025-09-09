@@ -1,6 +1,5 @@
 from django import forms
-
-from .models import Article
+from .models import Article, Publisher
 
 """
 Forms module for the articles app.
@@ -25,7 +24,7 @@ class ArticleForm(forms.ModelForm):
 
     class Meta:
         model = Article
-        fields = ["title", "content", "publisher", "author", "is_approved"]
+        fields = ["title", "content", "publisher", "is_approved"]
         widgets = {
             "title": forms.TextInput(
                 attrs={"class": "form-control", "placeholder": "Enter article title"}
@@ -40,4 +39,14 @@ class ArticleForm(forms.ModelForm):
             "publisher": forms.Select(attrs={"class": "form-select"}),
             "author": forms.Select(attrs={"class": "form-select"}),
             "is_approved": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+
+class PublisherForm(forms.ModelForm):
+    class Meta:
+        model = Publisher
+        fields = ["name", "editors", "journalists"]
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Publisher Name"}),
+            "editors": forms.SelectMultiple(attrs={"class": "form-select"}),
+            "journalists": forms.SelectMultiple(attrs={"class": "form-select"}),
         }

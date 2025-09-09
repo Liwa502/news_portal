@@ -24,12 +24,17 @@ urlpatterns = [
     # ---------------- Editor ----------------
     path("editor/", views.editor_article_list, name="editor_list"),
     path("editor/<int:pk>/edit/", views.editor_article_edit, name="editor_edit"),
+    path("editor/<int:pk>/delete/", views.editor_article_delete, name="editor_delete"),
 
     # ---------------- Journalist ----------------
     path("journalist/create/", views.journalist_article_create, name="journalist_create"),
     path("journalist/", views.journalist_article_list, name="journalist_list"),
     path("journalist/<int:pk>/edit/", views.journalist_article_edit, name="journalist_edit"),
     path("journalist/<int:pk>/delete/", views.journalist_article_delete, name="journalist_delete"),
+
+    # Publisher creation
+    path("publisher/create/", views.create_publisher, name="create_publisher"),
+
 
     # ---------------- API Endpoints ----------------
     path("api/articles/", api_views.SubscriberArticlesAPI.as_view(), name="api_articles"),

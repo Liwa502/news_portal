@@ -35,6 +35,24 @@ def editor_newsletter_list(request):
         {"newsletters": newsletters},
     )
 
+@login_required
+def editor_newsletter_delete(request, pk):
+    """
+    Allow editors to delete any newsletter.
+    """
+    if not request.user.is_authenticated or request.user.role != "editor":
+        raise PermissionDenied()
+    newsletter = get_object_or_404(Newsletter, pk=pk)
+    if request.method == "POST":
+        newsletter.delete()
+        return redirect("newsletters:editor_list")
+    return render(
+        request,
+        "newsletters/newsletter_confirm_delete.html",
+        {"newsletter": newsletter},
+    )
+
+
 
 def editor_newsletter_edit(request, pk):
     """
@@ -148,4 +166,43 @@ def journalist_newsletter_list(request):
         request,
         "newsletters/journalist_newsletter_list.html",
         {"newsletters": newsletters},
+    )
+
+@login_required
+def journalist_newsletter_edit(request, pk):
+    """
+    Allow journalists to edit their own newsletters.
+    """
+    if not request.user.is_authenticated or request.user.role != "journalist":
+        raise PermissionDenied()
+    newsletter = get_object_or_404(Newsletter, pk=pk, author=request.user)
+    if request.method == "POST":
+        form = NewsletterForm(request.POST, instance=newsletter)
+        if form.is_valid():
+            form.save()
+            return redirect("newsletters:journalist_list")
+    else:
+        form = NewsletterForm(instance=newsletter)
+    return render(
+        request,
+        "newsletters/newsletter_form.html",
+        {"form": form, "newsletter": newsletter},
+    )
+
+
+@login_required
+def journalist_newsletter_delete(request, pk):
+    """
+    Allow journalists to delete their own newsletters.
+    """
+    if not request.user.is_authenticated or request.user.role != "journalist":
+        raise PermissionDenied()
+    newsletter = get_object_or_404(Newsletter, pk=pk, author=request.user)
+    if request.method == "POST":
+        newsletter.delete()
+        return redirect("newsletters:journalist_list")
+    return render(
+        request,
+        "newsletters/newsletter_confirm_delete.html",
+        {"newsletter": newsletter},
     )

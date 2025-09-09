@@ -88,9 +88,9 @@ WSGI_APPLICATION = "news_portal.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "news_portal_db",
-        "USER": "news_user",
-        "PASSWORD": "StrongPassword123",
+        "NAME": "news_portal",
+        "USER": "user1",
+        "PASSWORD": os.getenv('DB_PASSWORD', 'StrongPassword123'),
         "HOST": "127.0.0.1",
         "PORT": "3306",
         "OPTIONS": {
