@@ -19,7 +19,8 @@ class Subscription(models.Model):
         created_at (DateTimeField): Timestamp when the subscription was created.
 
     Notes:
-        Each subscription must be unique for a combination of user, publisher, and journalist.
+        Each subscription must be unique for a combination of user, publisher,
+        and journalist.
     """
 
     user = models.ForeignKey(
@@ -49,9 +50,17 @@ class Subscription(models.Model):
         verbose_name_plural = "Subscriptions"
 
     def __str__(self):
-        """Return a human-readable representation of the subscription."""
+        """
+        Return a human-readable representation of the subscription.
+        """
         if self.publisher:
-            return f"{self.user.username} subscribes to publisher {self.publisher.name}"
-        elif self.journalist:
-            return f"{self.user.username} subscribes to journalist {self.journalist.user.username}"
+            return (
+                f"{self.user.username} subscribes to publisher "
+                f"{self.publisher.name}"
+            )
+        if self.journalist:
+            return (
+                f"{self.user.username} subscribes to journalist "
+                f"{self.journalist.user.username}"
+            )
         return f"{self.user.username} subscription"

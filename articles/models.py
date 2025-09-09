@@ -4,8 +4,8 @@ from django.db import models
 """
 Models module for the articles app.
 
-Defines Publisher, Article, and Journalist models with their fields, 
-relationships, and string representations. Supports editor/journalist 
+Defines Publisher, Article, and Journalist models with their fields,
+relationships, and string representations. Supports editor/journalist
 assignments and article management.
 """
 
@@ -22,8 +22,10 @@ class Publisher(models.Model):
 
     Attributes:
         name (CharField): Name of the publisher.
-        editors (ManyToManyField): Users with editor role associated with this publisher.
-        journalists (ManyToManyField): Users with journalist role associated with this publisher.
+        editors (ManyToManyField): Users with editor role associated with this
+            publisher.
+        journalists (ManyToManyField): Users with journalist role associated with
+            this publisher.
     """
 
     name = models.CharField(max_length=255)
@@ -35,12 +37,7 @@ class Publisher(models.Model):
     )
 
     def __str__(self):
-        """
-        Return a string representation of the Publisher.
-
-        Returns:
-            str: Name of the publisher.
-        """
+        """Return a string representation of the Publisher."""
         return self.name
 
 
@@ -77,12 +74,7 @@ class Article(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        """
-        Return a string representation of the Article.
-
-        Returns:
-            str: Title of the article.
-        """
+        """Return a string representation of the Article."""
         return self.title
 
 
@@ -102,10 +94,5 @@ class Journalist(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):
-        """
-        Return a string representation of the Journalist.
-
-        Returns:
-            str: Username of the linked user.
-        """
+        """Return a string representation of the Journalist."""
         return self.user.username

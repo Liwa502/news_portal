@@ -23,12 +23,11 @@ class CustomUser(AbstractUser):
     Attributes:
         role (CharField): The role of the user (Reader, Editor, Journalist).
 
-    Methods:
-        save(*args, **kwargs): Saves the user and assigns group and permissions based on role.
-    
     Properties:
-        subscribed_publishers: Returns a queryset of publishers the user is subscribed to.
-        subscribed_journalists: Returns a queryset of journalists the user is subscribed to.
+        subscribed_publishers: Returns a queryset of publishers the user is
+            subscribed to.
+        subscribed_journalists: Returns a queryset of journalists the user is
+            subscribed to.
     """
 
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
@@ -43,30 +42,32 @@ class CustomUser(AbstractUser):
         """
         super().save(*args, **kwargs)
 
-        if self.role:
-            group, _ = Group.objects.get_or_create(name=self.role.capitalize())
+        if not self.role:
+            return
 
-            if self.role == "reader":
-                perms = Permission.objects.filter(codename__startswith="view_")
-            elif self.role == "journalist":
-                perms = (
-                    Permission.objects.filter(codename__startswith="add_")
-                    | Permission.objects.filter(codename__startswith="view_")
-                    | Permission.objects.filter(codename__startswith="change_")
-                    | Permission.objects.filter(codename__startswith="delete_")
-                )
-            elif self.role == "editor":
-                perms = (
-                    Permission.objects.filter(codename__startswith="view_")
-                    | Permission.objects.filter(codename__startswith="change_")
-                    | Permission.objects.filter(codename__startswith="delete_")
-                )
-            else:
-                perms = Permission.objects.none()
+        group, _ = Group.objects.get_or_create(name=self.role.capitalize())
 
-            group.permissions.set(perms)
-            self.groups.clear()
-            self.groups.add(group)
+        if self.role == "reader":
+            perms = Permission.objects.filter(codename__startswith="view_")
+        elif self.role == "journalist":
+            perms = (
+                Permission.objects.filter(codename__startswith="add_")
+                | Permission.objects.filter(codename__startswith="view_")
+                | Permission.objects.filter(codename__startswith="change_")
+                | Permission.objects.filter(codename__startswith="delete_")
+            )
+        elif self.role == "editor":
+            perms = (
+                Permission.objects.filter(codename__startswith="view_")
+                | Permission.objects.filter(codename__startswith="change_")
+                | Permission.objects.filter(codename__startswith="delete_")
+            )
+        else:
+            perms = Permission.objects.none()
+
+        group.permissions.set(perms)
+        self.groups.clear()
+        self.groups.add(group)
 
     @property
     def subscribed_publishers(self):
