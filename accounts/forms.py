@@ -13,14 +13,14 @@ specifically extending Django's built-in UserCreationForm.
 
 class CustomUserCreationForm(UserCreationForm):
     """
-    Form for creating a new user with a role selection.
+    Form for creating a new user with role selection.
 
     Extends Django's UserCreationForm to include a 'role' field
     with choices for Reader, Journalist, or Editor.
 
     Attributes:
-        ROLE_CHOICES (tuple): A tuple of role options.
-        role (ChoiceField): Form field for selecting the user's role.
+        ROLE_CHOICES (tuple): Tuple of available role options.
+        role (ChoiceField): Field for selecting the user's role.
     """
 
     ROLE_CHOICES = (
@@ -35,7 +35,7 @@ class CustomUserCreationForm(UserCreationForm):
         """
         Metadata for CustomUserCreationForm.
 
-        Specifies the model to use and the fields to include in the form.
+        Specifies the model and fields to include in the form.
         """
 
         model = CustomUser

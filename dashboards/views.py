@@ -14,10 +14,17 @@ def dashboard(request):
     """
     Render the appropriate dashboard based on the logged-in user's role.
 
-    - Editors see the editor dashboard template.
-    - Journalists see the journalist dashboard template.
-    - Unauthenticated users are redirected to login.
-    - Other users (e.g., readers) are redirected to the articles home page.
+    Behavior:
+        - Editors: Render the editor dashboard template.
+        - Journalists: Render the journalist dashboard template.
+        - Readers: Redirect to the articles home page.
+        - Unauthenticated users: Redirect to the login page.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse or HttpResponseRedirect: Dashboard template render or redirect.
     """
     if not request.user.is_authenticated:
         return redirect("accounts:login")

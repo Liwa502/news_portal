@@ -9,7 +9,9 @@ class NewslettersConfig(AppConfig):
     """
     AppConfig for the Newsletters app.
 
-    Sets the default auto field type for models.
+    Attributes:
+        default_auto_field (str): Default field type for auto-created primary keys.
+        name (str): Name of the app.
     """
 
     default_auto_field = "django.db.models.BigAutoField"

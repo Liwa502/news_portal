@@ -15,24 +15,31 @@ Views module for the articles app.
 
 Includes:
 - Home view for all users
-- Editor views (approve/edit articles)
+- Editor views (approve/edit/delete articles)
 - Reader views (list/detail)
 - Journalist views (create/edit/delete articles)
+- Publisher creation view
 """
 
 User = get_user_model()
+
 
 # ---------------------------- Home View ----------------------------
 
 
 def home(request):
     """
-    Display home page with relevant articles, newsletters, publishers, and journalists
-    depending on the user's role (editor, journalist, reader).
+    Display home page with relevant content based on user's role.
 
-    - Editors see unapproved content.
-    - Journalists see their own unapproved content.
-    - Readers see approved content from their subscriptions.
+    Editors: See all unapproved articles and newsletters.
+    Journalists: See their own unapproved articles and newsletters.
+    Readers: See approved content from subscribed publishers and journalists.
+
+    Args:
+        request (HttpRequest): HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered home page with context data.
     """
     if not request.user.is_authenticated:
         return render(
@@ -61,9 +68,9 @@ def home(request):
         articles = Article.objects.filter(author=user, is_approved=False).order_by(
             "-created_at"
         )
-        newsletters = Newsletter.objects.filter(
-            author=user, is_approved=False
-        ).order_by("-created_at")
+        newsletters = Newsletter.objects.filter(author=user, is_approved=False).order_by(
+            "-created_at"
+        )
     elif user.role == "reader":
         subscribed_publishers = Subscription.objects.filter(
             user=user, publisher__isnull=False
@@ -116,6 +123,12 @@ def home(request):
 def create_publisher(request):
     """
     Allow editors or journalists to create a new publisher.
+
+    Args:
+        request (HttpRequest): HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered form or redirect to home on successful creation.
     """
     if request.user.role not in ["editor", "journalist"]:
         raise PermissionDenied()
@@ -124,7 +137,7 @@ def create_publisher(request):
         form = PublisherForm(request.POST)
         if form.is_valid():
             publisher = form.save()
-            # Ensure the current user is added automatically
+            # Auto-assign user to publisher
             if request.user.role == "editor":
                 publisher.editors.add(request.user)
             elif request.user.role == "journalist":
@@ -144,9 +157,16 @@ def editor_article_list(request):
     Display all articles for editors to review.
 
     Only accessible by users with role 'editor'.
+
+    Args:
+        request (HttpRequest): HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered article list page.
     """
     if not request.user.is_authenticated or request.user.role != "editor":
         raise PermissionDenied()
+
     articles = Article.objects.all().order_by("-created_at")
     return render(request, "articles/editor_article_list.html", {"articles": articles})
 
@@ -155,8 +175,15 @@ def editor_article_list(request):
 def editor_article_delete(request, pk):
     """
     Allow an editor to delete any article.
+
+    Args:
+        request (HttpRequest): HTTP request object.
+        pk (int): Primary key of the article.
+
+    Returns:
+        HttpResponse: Redirect to editor list after deletion.
     """
-    if not request.user.is_authenticated or request.user.role != "editor":
+    if request.user.role != "editor":
         raise PermissionDenied()
     article = get_object_or_404(Article, pk=pk)
     if request.method == "POST":
@@ -174,9 +201,17 @@ def editor_article_edit(request, pk):
     Allow editor to edit and approve an article.
 
     Only accessible by users with role 'editor'.
+
+    Args:
+        request (HttpRequest): HTTP request object.
+        pk (int): Primary key of the article.
+
+    Returns:
+        HttpResponse: Rendered article edit form or redirect on success.
     """
     if not request.user.is_authenticated or request.user.role != "editor":
         raise PermissionDenied()
+
     article = get_object_or_404(Article, pk=pk)
     if request.method == "POST":
         form = ArticleForm(request.POST, instance=article)
@@ -189,7 +224,9 @@ def editor_article_edit(request, pk):
     else:
         form = ArticleForm(instance=article)
     return render(
-        request, "articles/editor_article_edit.html", {"form": form, "article": article}
+        request,
+        "articles/editor_article_edit.html",
+        {"form": form, "article": article},
     )
 
 
@@ -199,10 +236,17 @@ def editor_article_edit(request, pk):
 @login_required
 def reader_article_list(request):
     """
-    Display approved articles for a reader based on their subscriptions.
+    Display approved articles for a reader based on subscriptions.
+
+    Args:
+        request (HttpRequest): HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered article list page for the reader.
     """
     if request.user.role != "reader":
         raise PermissionDenied()
+
     subscriptions_pub = Subscription.objects.filter(
         user=request.user, publisher__isnull=False
     ).values_list("publisher_id", flat=True)
@@ -225,6 +269,13 @@ def reader_article_list(request):
 def reader_article_detail(request, pk):
     """
     Display a single approved article for a reader.
+
+    Args:
+        request (HttpRequest): HTTP request object.
+        pk (int): Primary key of the article.
+
+    Returns:
+        HttpResponse: Rendered article detail page.
     """
     article = get_object_or_404(Article, pk=pk, is_approved=True)
     if request.user.role != "reader":
@@ -235,6 +286,13 @@ def reader_article_detail(request, pk):
 def article_detail(request, pk):
     """
     Display a single article regardless of approval status.
+
+    Args:
+        request (HttpRequest): HTTP request object.
+        pk (int): Primary key of the article.
+
+    Returns:
+        HttpResponse: Rendered article detail page.
     """
     article = get_object_or_404(Article, pk=pk)
     return render(request, "articles/article_detail.html", {"article": article})
@@ -246,9 +304,16 @@ def article_detail(request, pk):
 def journalist_article_create(request):
     """
     Allow a journalist to create a new article.
+
+    Args:
+        request (HttpRequest): HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered form or redirect to journalist article list.
     """
     if not request.user.is_authenticated or request.user.role != "journalist":
         raise PermissionDenied()
+
     if request.method == "POST":
         form = ArticleForm(request.POST)
         if form.is_valid():
@@ -264,9 +329,16 @@ def journalist_article_create(request):
 def journalist_article_list(request):
     """
     Display all articles created by the logged-in journalist.
+
+    Args:
+        request (HttpRequest): HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered list of journalist articles.
     """
     if not request.user.is_authenticated or request.user.role != "journalist":
         raise PermissionDenied()
+
     articles = Article.objects.filter(author=request.user).order_by("-created_at")
     return render(
         request, "articles/journalist_article_list.html", {"articles": articles}
@@ -276,6 +348,13 @@ def journalist_article_list(request):
 def journalist_article_edit(request, pk):
     """
     Allow a journalist to edit one of their own articles.
+
+    Args:
+        request (HttpRequest): HTTP request object.
+        pk (int): Primary key of the article.
+
+    Returns:
+        HttpResponse: Rendered article edit form or redirect on success.
     """
     article = get_object_or_404(Article, pk=pk, author=request.user)
     if request.method == "POST":
@@ -291,6 +370,13 @@ def journalist_article_edit(request, pk):
 def journalist_article_delete(request, pk):
     """
     Allow a journalist to delete one of their own articles.
+
+    Args:
+        request (HttpRequest): HTTP request object.
+        pk (int): Primary key of the article.
+
+    Returns:
+        HttpResponse: Redirect to journalist article list after deletion.
     """
     article = get_object_or_404(Article, pk=pk, author=request.user)
     if request.method == "POST":

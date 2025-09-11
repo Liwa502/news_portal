@@ -3,7 +3,7 @@ from django import forms
 from .models import Article, Publisher
 
 """
-Forms module for the articles app.
+Forms module for the Articles app.
 
 Contains form classes for creating and updating articles,
 including custom widgets for better UI/UX.
@@ -14,8 +14,8 @@ class ArticleForm(forms.ModelForm):
     """
     Form for creating and updating Article instances.
 
-    Uses custom widgets for title, content, publisher, author, and approval status
-    to enhance form presentation and usability.
+    Uses custom widgets for title, content, publisher, author, and approval
+    status to enhance form presentation and usability.
 
     Meta:
         model (Article): The Article model linked to this form.
@@ -44,6 +44,13 @@ class ArticleForm(forms.ModelForm):
 
 
 class PublisherForm(forms.ModelForm):
+    """
+    Form for creating and updating Publisher instances.
+
+    Provides custom widgets for name, editors, and journalists fields
+    to improve usability.
+    """
+
     class Meta:
         model = Publisher
         fields = ["name", "editors", "journalists"]

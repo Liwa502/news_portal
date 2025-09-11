@@ -1,11 +1,10 @@
 from rest_framework import serializers
 
 from newsletters.models import Newsletter
-
 from .models import Article
 
 """
-Serializers module for the articles app.
+Serializers module for the Articles app.
 
 Defines serializers for Article and Newsletter models to convert
 model instances into JSON format for REST API responses.
@@ -20,8 +19,7 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     Attributes:
         author (PrimaryKeyRelatedField): Read-only field returning the author's ID.
-        publisher (PrimaryKeyRelatedField): Read-only field returning the publisher's
-        ID.
+        publisher (PrimaryKeyRelatedField): Read-only field returning the publisher's ID.
     """
 
     author = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -63,8 +61,7 @@ class NewsletterSerializer(serializers.ModelSerializer):
 
     Attributes:
         author (PrimaryKeyRelatedField): Read-only field returning the author's ID.
-        publisher (PrimaryKeyRelatedField): Read-only field returning the publisher's
-        ID.
+        publisher (PrimaryKeyRelatedField): Read-only field returning the publisher's ID.
     """
 
     author = serializers.PrimaryKeyRelatedField(read_only=True)

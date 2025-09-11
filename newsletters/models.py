@@ -4,14 +4,14 @@ from django.db import models
 """
 Models for the newsletters app.
 
-Includes the Newsletter model representing publications associated with
+Defines the Newsletter model representing publications associated with
 publishers and authors.
 """
 
 
 class Newsletter(models.Model):
     """
-    Newsletter model.
+    Represents a newsletter publication associated with a publisher and author.
 
     Attributes:
         title (CharField): Title of the newsletter.
@@ -21,9 +21,9 @@ class Newsletter(models.Model):
         is_approved (BooleanField): Flag indicating if the newsletter is approved.
         created_at (DateTimeField): Timestamp of creation.
 
-    Related names:
-        publisher.newsletters: All newsletters for a publisher.
-        user.newsletters: All newsletters authored by a user.
+    Related objects:
+        publisher.newsletters: All newsletters for a given publisher.
+        user.newsletters: All newsletters authored by a given user.
     """
 
     title = models.CharField(max_length=255)
@@ -42,4 +42,10 @@ class Newsletter(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
+        """
+        Return a string representation of the Newsletter.
+
+        Returns:
+            str: The title of the newsletter.
+        """
         return self.title
