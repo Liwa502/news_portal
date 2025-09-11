@@ -54,10 +54,16 @@ def home(request):
 
     if user.role == "editor":
         articles = Article.objects.filter(is_approved=False).order_by("-created_at")
-        newsletters = Newsletter.objects.filter(is_approved=False).order_by("-created_at")
+        newsletters = Newsletter.objects.filter(is_approved=False).order_by(
+            "-created_at"
+        )
     elif user.role == "journalist":
-        articles = Article.objects.filter(author=user, is_approved=False).order_by("-created_at")
-        newsletters = Newsletter.objects.filter(author=user, is_approved=False).order_by("-created_at")
+        articles = Article.objects.filter(author=user, is_approved=False).order_by(
+            "-created_at"
+        )
+        newsletters = Newsletter.objects.filter(
+            author=user, is_approved=False
+        ).order_by("-created_at")
     elif user.role == "reader":
         subscribed_publishers = Subscription.objects.filter(
             user=user, publisher__isnull=False
@@ -102,7 +108,9 @@ def home(request):
         },
     )
 
+
 # ---------------------------- Editor + Journalist View ----------------------------
+
 
 @login_required
 def create_publisher(request):
@@ -127,6 +135,7 @@ def create_publisher(request):
         form = PublisherForm()
     return render(request, "articles/publisher_form.html", {"form": form})
 
+
 # ---------------------------- Editor Views ----------------------------
 
 
@@ -140,6 +149,7 @@ def editor_article_list(request):
         raise PermissionDenied()
     articles = Article.objects.all().order_by("-created_at")
     return render(request, "articles/editor_article_list.html", {"articles": articles})
+
 
 @login_required
 def editor_article_delete(request, pk):
@@ -178,7 +188,9 @@ def editor_article_edit(request, pk):
             return redirect("articles:editor_list")
     else:
         form = ArticleForm(instance=article)
-    return render(request, "articles/editor_article_edit.html", {"form": form, "article": article})
+    return render(
+        request, "articles/editor_article_edit.html", {"form": form, "article": article}
+    )
 
 
 # ---------------------------- Reader Views ----------------------------
@@ -256,7 +268,9 @@ def journalist_article_list(request):
     if not request.user.is_authenticated or request.user.role != "journalist":
         raise PermissionDenied()
     articles = Article.objects.filter(author=request.user).order_by("-created_at")
-    return render(request, "articles/journalist_article_list.html", {"articles": articles})
+    return render(
+        request, "articles/journalist_article_list.html", {"articles": articles}
+    )
 
 
 def journalist_article_edit(request, pk):

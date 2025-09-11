@@ -11,5 +11,6 @@ class SubscriptionsConfig(AppConfig):
     """
     AppConfig for the subscriptions app.
     """
+
     default_auto_field = "django.db.models.BigAutoField"
     name = "subscriptions"

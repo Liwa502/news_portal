@@ -1,12 +1,13 @@
 from rest_framework import serializers
 
 from newsletters.models import Newsletter
+
 from .models import Article
 
 """
 Serializers module for the articles app.
 
-Defines serializers for Article and Newsletter models to convert 
+Defines serializers for Article and Newsletter models to convert
 model instances into JSON format for REST API responses.
 """
 
@@ -19,7 +20,8 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     Attributes:
         author (PrimaryKeyRelatedField): Read-only field returning the author's ID.
-        publisher (PrimaryKeyRelatedField): Read-only field returning the publisher's ID.
+        publisher (PrimaryKeyRelatedField): Read-only field returning the publisher's
+        ID.
     """
 
     author = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -29,9 +31,10 @@ class ArticleSerializer(serializers.ModelSerializer):
         """
         Meta class for ArticleSerializer.
 
-        Specifies the model, fields to include in serialization,
-        and read-only fields.
+        Specifies the model, fields to include in serialization, and
+        read-only fields.
         """
+
         model = Article
         fields = [
             "id",
@@ -43,7 +46,13 @@ class ArticleSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["id", "author", "publisher", "created_at", "updated_at"]
+        read_only_fields = [
+            "id",
+            "author",
+            "publisher",
+            "created_at",
+            "updated_at",
+        ]
 
 
 class NewsletterSerializer(serializers.ModelSerializer):
@@ -54,7 +63,8 @@ class NewsletterSerializer(serializers.ModelSerializer):
 
     Attributes:
         author (PrimaryKeyRelatedField): Read-only field returning the author's ID.
-        publisher (PrimaryKeyRelatedField): Read-only field returning the publisher's ID.
+        publisher (PrimaryKeyRelatedField): Read-only field returning the publisher's
+        ID.
     """
 
     author = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -64,9 +74,10 @@ class NewsletterSerializer(serializers.ModelSerializer):
         """
         Meta class for NewsletterSerializer.
 
-        Specifies the model, fields to include in serialization,
-        and read-only fields.
+        Specifies the model, fields to include in serialization, and
+        read-only fields.
         """
+
         model = Newsletter
         fields = [
             "id",

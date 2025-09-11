@@ -9,7 +9,7 @@ User = get_user_model()
 """
 Views module for accounts app.
 
-Contains views for user registration, login, and logout. 
+Contains views for user registration, login, and logout.
 Handles authentication, user creation, and related messages.
 """
 

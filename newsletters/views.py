@@ -20,6 +20,7 @@ Includes views for editors, journalists, and readers:
 
 # ---------------------------- Editor Views ----------------------------
 
+
 def editor_newsletter_list(request):
     """
     Display a list of all newsletters for editors.
@@ -34,6 +35,7 @@ def editor_newsletter_list(request):
         "newsletters/editor_newsletter_list.html",
         {"newsletters": newsletters},
     )
+
 
 @login_required
 def editor_newsletter_delete(request, pk):
@@ -51,7 +53,6 @@ def editor_newsletter_delete(request, pk):
         "newsletters/newsletter_confirm_delete.html",
         {"newsletter": newsletter},
     )
-
 
 
 def editor_newsletter_edit(request, pk):
@@ -85,6 +86,7 @@ def editor_newsletter_edit(request, pk):
 
 
 # ---------------------------- Reader Views ----------------------------
+
 
 @login_required
 def reader_newsletter_list(request):
@@ -135,6 +137,7 @@ def reader_newsletter_detail(request, pk):
 
 # ---------------------------- Journalist Views ----------------------------
 
+
 def journalist_newsletter_create(request):
     """
     Allow journalists to create a new newsletter.
@@ -167,6 +170,7 @@ def journalist_newsletter_list(request):
         "newsletters/journalist_newsletter_list.html",
         {"newsletters": newsletters},
     )
+
 
 @login_required
 def journalist_newsletter_edit(request, pk):

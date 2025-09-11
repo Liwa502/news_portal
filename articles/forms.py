@@ -1,10 +1,11 @@
 from django import forms
+
 from .models import Article, Publisher
 
 """
 Forms module for the articles app.
 
-Contains form classes for creating and updating articles, 
+Contains form classes for creating and updating articles,
 including custom widgets for better UI/UX.
 """
 
@@ -41,12 +42,15 @@ class ArticleForm(forms.ModelForm):
             "is_approved": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
+
 class PublisherForm(forms.ModelForm):
     class Meta:
         model = Publisher
         fields = ["name", "editors", "journalists"]
         widgets = {
-            "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Publisher Name"}),
+            "name": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Publisher Name"}
+            ),
             "editors": forms.SelectMultiple(attrs={"class": "form-select"}),
             "journalists": forms.SelectMultiple(attrs={"class": "form-select"}),
         }

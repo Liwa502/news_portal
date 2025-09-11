@@ -27,6 +27,7 @@ class CustomUserAdmin(UserAdmin):
     Displays username, email, role, and permissions in admin list view.
     Customizes fieldsets and add_fieldsets for user creation and editing.
     """
+
     model = CustomUser
     list_display = ("username", "email", "role", "is_staff", "is_active")
     list_filter = ("role", "is_staff", "is_active")
@@ -70,6 +71,7 @@ class PublisherAdmin(admin.ModelAdmin):
     Displays publisher name and allows assigning editors and journalists
     using a horizontal filter widget.
     """
+
     list_display = ("name",)
     filter_horizontal = ("editors", "journalists")
 
@@ -84,6 +86,7 @@ class JournalistAdmin(admin.ModelAdmin):
 
     Displays linked user and allows search by username or email.
     """
+
     list_display = ("user",)
     search_fields = ("user__username", "user__email")
 
@@ -99,6 +102,7 @@ class ArticleAdmin(admin.ModelAdmin):
     Displays article details, filters by approval status and publisher,
     and allows search by title, content, or author username.
     """
+
     list_display = ("title", "author", "publisher", "is_approved", "created_at")
     list_filter = ("is_approved", "publisher")
     search_fields = ("title", "content", "author__username")
@@ -115,6 +119,7 @@ class NewsletterAdmin(admin.ModelAdmin):
     Displays newsletter details, filters by approval status and publisher,
     and allows search by title, content, or author username.
     """
+
     list_display = ("title", "author", "publisher", "is_approved", "created_at")
     list_filter = ("is_approved", "publisher")
     search_fields = ("title", "content", "author__username")
@@ -131,6 +136,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
     Displays subscription details, filters by publisher and journalist,
     and allows search by user, publisher, or journalist username.
     """
+
     list_display = ("user", "publisher", "journalist", "created_at")
     list_filter = ("publisher", "journalist")
     search_fields = ("user__username", "publisher__name", "journalist__user__username")

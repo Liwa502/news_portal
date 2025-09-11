@@ -16,5 +16,6 @@ class AccountsConfig(AppConfig):
         default_auto_field (str): Default field type for auto-created primary keys.
         name (str): Name of the app.
     """
+
     default_auto_field = "django.db.models.BigAutoField"
     name = "accounts"

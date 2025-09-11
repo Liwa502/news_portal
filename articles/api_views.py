@@ -10,7 +10,7 @@ from .serializers import ArticleSerializer, NewsletterSerializer
 """
 API views for articles and newsletters.
 
-Provides REST API endpoints for retrieving articles and newsletters 
+Provides REST API endpoints for retrieving articles and newsletters
 based on user subscriptions and roles (reader, journalist, editor).
 """
 
@@ -23,6 +23,7 @@ class SubscriberArticlesAPI(generics.ListAPIView):
     Journalists: Articles authored by the user.
     Editors: All articles.
     """
+
     serializer_class = ArticleSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -60,6 +61,7 @@ class SubscriberNewslettersAPI(generics.ListAPIView):
     Journalists: Newsletters authored by the user.
     Editors: All newsletters.
     """
+
     serializer_class = NewsletterSerializer
     permission_classes = [permissions.IsAuthenticated]
 
