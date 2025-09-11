@@ -24,7 +24,7 @@ class CustomUserAdmin(UserAdmin):
     """
     Admin interface for the CustomUser model.
 
-    Displays username, email, role, and permissions in admin list view.
+    Displays username, email, role, and permissions in the admin list view.
     Customizes fieldsets and add_fieldsets for user creation and editing.
     """
 

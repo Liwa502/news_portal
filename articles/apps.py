@@ -3,14 +3,14 @@ from django.apps import AppConfig
 """
 Articles app configuration module.
 
-Defines the configuration for the articles app, including the default
-primary key field type and app name. Also imports signals on app ready.
+Defines the configuration for the Articles app, including the default
+primary key field type and app name. Also imports signals when the app is ready.
 """
 
 
 class ArticlesConfig(AppConfig):
     """
-    Configuration class for the articles app.
+    Configuration class for the Articles app.
 
     Attributes:
         default_auto_field (str): Default field type for auto-created primary keys.

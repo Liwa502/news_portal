@@ -1,16 +1,16 @@
 from django.apps import AppConfig
 
 """
-Accounts app configuration module.
+Accounts app configuration.
 
-Defines the configuration for the accounts app, including the default
-primary key field type and app name.
+This module defines the configuration for the Accounts app, including
+the default primary key field type and app name.
 """
 
 
 class AccountsConfig(AppConfig):
     """
-    Configuration class for the accounts app.
+    Configuration for the Accounts app.
 
     Attributes:
         default_auto_field (str): Default field type for auto-created primary keys.

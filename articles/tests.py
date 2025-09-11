@@ -12,7 +12,7 @@ from subscriptions.models import Subscription
 from .models import Article, Journalist, Publisher
 
 """
-Tests module for the articles app.
+Tests module for the Articles app.
 
 Contains unit tests and API tests for:
 - Editor functionality (approving content, access control)

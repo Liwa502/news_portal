@@ -39,9 +39,7 @@ def editor_newsletter_list(request):
 
 @login_required
 def editor_newsletter_delete(request, pk):
-    """
-    Allow editors to delete any newsletter.
-    """
+    """Allow editors to delete any newsletter."""
     if not request.user.is_authenticated or request.user.role != "editor":
         raise PermissionDenied()
     newsletter = get_object_or_404(Newsletter, pk=pk)
@@ -60,7 +58,7 @@ def editor_newsletter_edit(request, pk):
     Allow editors to edit and approve a newsletter.
 
     Parameters:
-    - pk: Primary key of the newsletter to edit.
+        pk (int): Primary key of the newsletter to edit.
 
     Only accessible to users with the 'editor' role.
     """
@@ -123,7 +121,7 @@ def reader_newsletter_detail(request, pk):
     Display a single approved newsletter to a reader.
 
     Parameters:
-    - pk: Primary key of the newsletter.
+        pk (int): Primary key of the newsletter.
 
     Only accessible to users with the 'reader' role.
     """
@@ -159,9 +157,7 @@ def journalist_newsletter_create(request):
 
 
 def journalist_newsletter_list(request):
-    """
-    Display all newsletters created by the logged-in journalist.
-    """
+    """Display all newsletters created by the logged-in journalist."""
     if not request.user.is_authenticated or request.user.role != "journalist":
         raise PermissionDenied()
     newsletters = Newsletter.objects.filter(author=request.user).order_by("-created_at")
@@ -174,9 +170,7 @@ def journalist_newsletter_list(request):
 
 @login_required
 def journalist_newsletter_edit(request, pk):
-    """
-    Allow journalists to edit their own newsletters.
-    """
+    """Allow journalists to edit their own newsletters."""
     if not request.user.is_authenticated or request.user.role != "journalist":
         raise PermissionDenied()
     newsletter = get_object_or_404(Newsletter, pk=pk, author=request.user)
@@ -188,17 +182,13 @@ def journalist_newsletter_edit(request, pk):
     else:
         form = NewsletterForm(instance=newsletter)
     return render(
-        request,
-        "newsletters/newsletter_form.html",
-        {"form": form, "newsletter": newsletter},
+        request, "newsletters/newsletter_form.html", {"form": form, "newsletter": newsletter}
     )
 
 
 @login_required
 def journalist_newsletter_delete(request, pk):
-    """
-    Allow journalists to delete their own newsletters.
-    """
+    """Allow journalists to delete their own newsletters."""
     if not request.user.is_authenticated or request.user.role != "journalist":
         raise PermissionDenied()
     newsletter = get_object_or_404(Newsletter, pk=pk, author=request.user)

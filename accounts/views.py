@@ -7,7 +7,7 @@ from .forms import CustomUserCreationForm
 User = get_user_model()
 
 """
-Views module for accounts app.
+Views module for the accounts app.
 
 Contains views for user registration, login, and logout.
 Handles authentication, user creation, and related messages.

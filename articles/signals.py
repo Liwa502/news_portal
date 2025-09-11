@@ -13,7 +13,7 @@ from subscriptions.models import Subscription
 from .models import Article
 
 """
-Signals module for the articles app.
+Signals module for the Articles app.
 
 Handles post-save signals for Article and Newsletter models.
 Sends notifications to subscribers via email and optionally posts updates to Twitter.
@@ -61,9 +61,9 @@ def notify_subscribers_and_twitter(publisher, journalist, title, content):
         content (str): Content of the article/newsletter.
     """
     # ---------------- FETCH SUBSCRIBERS ----------------
-    publisher_sub_ids = Subscription.objects.filter(publisher=publisher).values_list(
-        "user_id", flat=True
-    )
+    publisher_sub_ids = Subscription.objects.filter(
+        publisher=publisher
+    ).values_list("user_id", flat=True)
 
     journalist_sub_ids = []
     if journalist:
@@ -100,8 +100,6 @@ def notify_subscribers_and_twitter(publisher, journalist, title, content):
 
 
 # ---------------- SIGNALS ----------------
-
-
 @receiver(post_save, sender=Article)
 def article_approved_handler(sender, instance, created, **kwargs):
     """
