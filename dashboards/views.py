@@ -19,6 +19,7 @@ def dashboard(request):
         - Journalists: Render the journalist dashboard template.
         - Readers: Redirect to the articles home page.
         - Unauthenticated users: Redirect to the login page.
+        - Unknown roles: Redirect to the articles home page as a fallback.
 
     Args:
         request (HttpRequest): The HTTP request object.
@@ -29,9 +30,14 @@ def dashboard(request):
     if not request.user.is_authenticated:
         return redirect("accounts:login")
 
-    if request.user.role == "editor":
+    role = getattr(request.user, "role", None)
+
+    if role == "editor":
         return render(request, "dashboards/editor_dashboard.html")
-    elif request.user.role == "journalist":
+    elif role == "journalist":
         return render(request, "dashboards/journalist_dashboard.html")
+    elif role == "reader":
+        return redirect("articles:home")
     else:
+        # Fallback for unexpected roles
         return redirect("articles:home")

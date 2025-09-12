@@ -1,14 +1,16 @@
-from rest_framework import serializers
-
-from newsletters.models import Newsletter
-from .models import Article
-
 """
+articles.serializers
+
 Serializers module for the Articles app.
 
 Defines serializers for Article and Newsletter models to convert
 model instances into JSON format for REST API responses.
 """
+
+from rest_framework import serializers
+
+from newsletters.models import Newsletter
+from .models import Article
 
 
 class ArticleSerializer(serializers.ModelSerializer):

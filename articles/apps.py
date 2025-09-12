@@ -1,11 +1,13 @@
-from django.apps import AppConfig
-
 """
+articles.apps
+
 Articles app configuration module.
 
 Defines the configuration for the Articles app, including the default
 primary key field type and app name. Also imports signals when the app is ready.
 """
+
+from django.apps import AppConfig
 
 
 class ArticlesConfig(AppConfig):

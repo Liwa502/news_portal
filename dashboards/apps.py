@@ -1,9 +1,11 @@
 from django.apps import AppConfig
 
 """
-Configuration for the dashboards app.
+dashboards.apps
 
-This module defines the AppConfig for the dashboards application, including
+Configuration for the Dashboards app.
+
+Defines the AppConfig for the dashboards application, including
 the default primary key field type for models.
 """
 

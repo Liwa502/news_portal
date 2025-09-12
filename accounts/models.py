@@ -1,13 +1,17 @@
+"""
+accounts.models
+
+Module defining the custom user model.
+
+Provides the CustomUser class, which extends Django's AbstractUser
+to include user roles and automatically assign groups and permissions
+based on the role. Also provides properties for accessing subscribed
+publishers and journalists.
+"""
+
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 
-"""
-Custom user model module.
-
-Defines the CustomUser class, extending Django's AbstractUser to include
-roles and automatically assign groups and permissions based on the role.
-Provides properties for accessing subscribed publishers and journalists.
-"""
 
 ROLE_CHOICES = (
     ("reader", "Reader"),
@@ -34,9 +38,10 @@ class CustomUser(AbstractUser):
         """
         Save the user instance and assign group and permissions based on role.
 
-        Readers get 'view' permissions.
-        Journalists get 'add', 'view', 'change', 'delete' permissions.
-        Editors get 'view', 'change', 'delete' permissions.
+        Permissions are assigned as follows:
+            - Reader: 'view' permissions only
+            - Journalist: 'add', 'view', 'change', 'delete' permissions
+            - Editor: 'view', 'change', 'delete' permissions
         """
         super().save(*args, **kwargs)
 
@@ -70,7 +75,7 @@ class CustomUser(AbstractUser):
     @property
     def subscribed_publishers(self):
         """
-        Get the publishers the user is subscribed to.
+        Return the publishers the user is subscribed to.
 
         Returns:
             QuerySet: Publishers subscribed by this user.
@@ -82,7 +87,7 @@ class CustomUser(AbstractUser):
     @property
     def subscribed_journalists(self):
         """
-        Get the journalists the user is subscribed to.
+        Return the journalists the user is subscribed to.
 
         Returns:
             QuerySet: Journalists subscribed by this user.

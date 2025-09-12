@@ -1,3 +1,13 @@
+"""
+articles.admin
+
+Admin configuration module for the Articles app.
+
+Registers models with Django admin and customizes their display, filters,
+search fields, and fieldsets for easier management of users, articles,
+publishers, journalists, newsletters, and subscriptions.
+"""
+
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
@@ -6,14 +16,6 @@ from newsletters.models import Newsletter
 from subscriptions.models import Subscription
 
 from .models import Article, Journalist, Publisher
-
-"""
-Admin configuration module for the articles app.
-
-Registers models with Django admin and customizes their display, filters,
-search fields, and fieldsets for easier management of users, articles,
-publishers, journalists, newsletters, and subscriptions.
-"""
 
 
 # ----------------------
@@ -139,4 +141,8 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
     list_display = ("user", "publisher", "journalist", "created_at")
     list_filter = ("publisher", "journalist")
-    search_fields = ("user__username", "publisher__name", "journalist__user__username")
+    search_fields = (
+        "user__username",
+        "publisher__name",
+        "journalist__user__username",
+    )

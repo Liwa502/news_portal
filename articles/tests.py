@@ -1,3 +1,15 @@
+"""
+articles.tests
+
+Tests module for the Articles app.
+
+Contains unit tests and API tests for:
+- Editor functionality (approving content, access control)
+- Subscriber-facing API endpoints for articles and newsletters
+- Subscription functionality (subscribe/unsubscribe)
+- Mocked external services (e.g., Twitter)
+"""
+
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
@@ -10,16 +22,6 @@ from newsletters.models import Newsletter
 from subscriptions.models import Subscription
 
 from .models import Article, Journalist, Publisher
-
-"""
-Tests module for the Articles app.
-
-Contains unit tests and API tests for:
-- Editor functionality (approving content, access control)
-- Subscriber-facing API endpoints for articles and newsletters
-- Subscription functionality (subscribe/unsubscribe)
-- Mocked external services (e.g., Twitter)
-"""
 
 # Get the custom user model
 User = get_user_model()
@@ -106,7 +108,9 @@ class EditorFunctionalityTests(BaseTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_non_editor_cannot_access_editor_views(self):
-        """Non-editors (e.g., readers) should NOT be able to access editor views."""
+        """
+        Non-editors (e.g., readers) should NOT be able to access editor views.
+        """
         self.client.login(username="reader", password="pass123")
         response = self.client.get(reverse("articles:editor_list"))
         self.assertIn(response.status_code, [403, 302])
@@ -200,9 +204,7 @@ class SubscriberAPITests(BaseTestCase):
         self.assertIn(response.status_code, [302, 200])
         Subscription.objects.filter(user=self.reader, publisher=self.publisher).delete()
         self.assertFalse(
-            Subscription.objects.filter(
-                user=self.reader, publisher=self.publisher
-            ).exists()
+            Subscription.objects.filter(user=self.reader, publisher=self.publisher).exists()
         )
 
         response = self.client_api.post(
@@ -211,38 +213,26 @@ class SubscriberAPITests(BaseTestCase):
         self.assertIn(response.status_code, [302, 200])
         Subscription.objects.get_or_create(user=self.reader, publisher=self.publisher)
         self.assertTrue(
-            Subscription.objects.filter(
-                user=self.reader, publisher=self.publisher
-            ).exists()
+            Subscription.objects.filter(user=self.reader, publisher=self.publisher).exists()
         )
 
     def test_reader_can_subscribe_and_unsubscribe_journalist(self):
         """Reader should be able to subscribe/unsubscribe from journalists."""
         self.client_api.force_authenticate(user=self.reader)
         response = self.client_api.post(
-            reverse(
-                "subscriptions:journalist_unsubscribe", args=[self.journalist_user.pk]
-            )
+            reverse("subscriptions:journalist_unsubscribe", args=[self.journalist_user.pk])
         )
         self.assertIn(response.status_code, [302, 200])
-        Subscription.objects.filter(
-            user=self.reader, journalist=self.journalist
-        ).delete()
+        Subscription.objects.filter(user=self.reader, journalist=self.journalist).delete()
         self.assertFalse(
-            Subscription.objects.filter(
-                user=self.reader, journalist=self.journalist
-            ).exists()
+            Subscription.objects.filter(user=self.reader, journalist=self.journalist).exists()
         )
 
         response = self.client_api.post(
-            reverse(
-                "subscriptions:journalist_subscribe", args=[self.journalist_user.pk]
-            )
+            reverse("subscriptions:journalist_subscribe", args=[self.journalist_user.pk])
         )
         self.assertIn(response.status_code, [302, 200])
         Subscription.objects.get_or_create(user=self.reader, journalist=self.journalist)
         self.assertTrue(
-            Subscription.objects.filter(
-                user=self.reader, journalist=self.journalist
-            ).exists()
+            Subscription.objects.filter(user=self.reader, journalist=self.journalist).exists()
         )

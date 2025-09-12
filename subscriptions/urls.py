@@ -1,5 +1,5 @@
 """
-URL configuration for the subscriptions app.
+URL configuration for the Subscriptions app.
 
 Defines routes for subscribing and unsubscribing to publishers and journalists.
 """

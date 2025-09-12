@@ -1,14 +1,17 @@
+"""
+accounts.forms
+
+Module containing custom user-related forms.
+
+This module defines form classes for user creation and management,
+extending Django's built-in UserCreationForm to add additional fields
+such as user roles.
+"""
+
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 
 from .models import CustomUser
-
-"""
-Forms module for user-related forms.
-
-Contains custom form classes for user creation and management,
-specifically extending Django's built-in UserCreationForm.
-"""
 
 
 class CustomUserCreationForm(UserCreationForm):

@@ -1,3 +1,12 @@
+"""
+accounts.views
+
+Views module for the Accounts app.
+
+Contains views for user registration, login, and logout.
+Handles authentication, user creation, and related messages.
+"""
+
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.shortcuts import redirect, render
@@ -5,13 +14,6 @@ from django.shortcuts import redirect, render
 from .forms import CustomUserCreationForm
 
 User = get_user_model()
-
-"""
-Views module for the accounts app.
-
-Contains views for user registration, login, and logout.
-Handles authentication, user creation, and related messages.
-"""
 
 
 def register(request):

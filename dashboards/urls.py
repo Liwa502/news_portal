@@ -1,5 +1,4 @@
 from django.urls import path
-
 from . import views
 
 """
@@ -9,6 +8,8 @@ Provides role-based dashboard routes:
 - Editor
 - Journalist
 - Reader
+
+All routes use the same `dashboard` view, which handles content based on user role.
 """
 
 app_name = "dashboards"

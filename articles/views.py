@@ -1,3 +1,16 @@
+"""
+articles.views
+
+Views module for the Articles app.
+
+Includes:
+- Home view for all users
+- Editor views (approve/edit/delete articles)
+- Reader views (list/detail)
+- Journalist views (create/edit/delete articles)
+- Publisher creation view
+"""
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -10,36 +23,24 @@ from subscriptions.models import Subscription
 from .forms import ArticleForm, PublisherForm
 from .models import Article, Journalist, Publisher
 
-"""
-Views module for the articles app.
-
-Includes:
-- Home view for all users
-- Editor views (approve/edit/delete articles)
-- Reader views (list/detail)
-- Journalist views (create/edit/delete articles)
-- Publisher creation view
-"""
-
 User = get_user_model()
 
 
 # ---------------------------- Home View ----------------------------
 
-
 def home(request):
     """
-    Display home page with relevant content based on user's role.
+    Display the home page with content based on user role.
 
-    Editors: See all unapproved articles and newsletters.
-    Journalists: See their own unapproved articles and newsletters.
-    Readers: See approved content from subscribed publishers and journalists.
+    Editors: All unapproved articles/newsletters.
+    Journalists: Their own unapproved articles/newsletters.
+    Readers: Approved content from subscribed publishers/journalists.
 
     Args:
         request (HttpRequest): HTTP request object.
 
     Returns:
-        HttpResponse: Rendered home page with context data.
+        HttpResponse: Rendered home page with context.
     """
     if not request.user.is_authenticated:
         return render(
@@ -61,16 +62,10 @@ def home(request):
 
     if user.role == "editor":
         articles = Article.objects.filter(is_approved=False).order_by("-created_at")
-        newsletters = Newsletter.objects.filter(is_approved=False).order_by(
-            "-created_at"
-        )
+        newsletters = Newsletter.objects.filter(is_approved=False).order_by("-created_at")
     elif user.role == "journalist":
-        articles = Article.objects.filter(author=user, is_approved=False).order_by(
-            "-created_at"
-        )
-        newsletters = Newsletter.objects.filter(author=user, is_approved=False).order_by(
-            "-created_at"
-        )
+        articles = Article.objects.filter(author=user, is_approved=False).order_by("-created_at")
+        newsletters = Newsletter.objects.filter(author=user, is_approved=False).order_by("-created_at")
     elif user.role == "reader":
         subscribed_publishers = Subscription.objects.filter(
             user=user, publisher__isnull=False
@@ -81,8 +76,8 @@ def home(request):
 
         articles = (
             Article.objects.filter(
-                Q(publisher__id__in=subscribed_publishers)
-                | Q(author__id__in=subscribed_journalists),
+                Q(publisher__id__in=subscribed_publishers) |
+                Q(author__id__in=subscribed_journalists),
                 is_approved=True,
             )
             .distinct()
@@ -90,8 +85,8 @@ def home(request):
         )
         newsletters = (
             Newsletter.objects.filter(
-                Q(publisher__id__in=subscribed_publishers)
-                | Q(author__id__in=subscribed_journalists),
+                Q(publisher__id__in=subscribed_publishers) |
+                Q(author__id__in=subscribed_journalists),
                 is_approved=True,
             )
             .distinct()
@@ -116,8 +111,7 @@ def home(request):
     )
 
 
-# ---------------------------- Editor + Journalist View ----------------------------
-
+# ---------------------------- Publisher Creation ----------------------------
 
 @login_required
 def create_publisher(request):
@@ -128,7 +122,7 @@ def create_publisher(request):
         request (HttpRequest): HTTP request object.
 
     Returns:
-        HttpResponse: Rendered form or redirect to home on successful creation.
+        HttpResponse: Rendered form or redirect on success.
     """
     if request.user.role not in ["editor", "journalist"]:
         raise PermissionDenied()
@@ -137,7 +131,6 @@ def create_publisher(request):
         form = PublisherForm(request.POST)
         if form.is_valid():
             publisher = form.save()
-            # Auto-assign user to publisher
             if request.user.role == "editor":
                 publisher.editors.add(request.user)
             elif request.user.role == "journalist":
@@ -151,12 +144,9 @@ def create_publisher(request):
 
 # ---------------------------- Editor Views ----------------------------
 
-
 def editor_article_list(request):
     """
     Display all articles for editors to review.
-
-    Only accessible by users with role 'editor'.
 
     Args:
         request (HttpRequest): HTTP request object.
@@ -178,7 +168,7 @@ def editor_article_delete(request, pk):
 
     Args:
         request (HttpRequest): HTTP request object.
-        pk (int): Primary key of the article.
+        pk (int): Article primary key.
 
     Returns:
         HttpResponse: Redirect to editor list after deletion.
@@ -189,22 +179,16 @@ def editor_article_delete(request, pk):
     if request.method == "POST":
         article.delete()
         return redirect("articles:editor_list")
-    return render(
-        request,
-        "articles/article_confirm_delete.html",
-        {"article": article},
-    )
+    return render(request, "articles/article_confirm_delete.html", {"article": article})
 
 
 def editor_article_edit(request, pk):
     """
     Allow editor to edit and approve an article.
 
-    Only accessible by users with role 'editor'.
-
     Args:
         request (HttpRequest): HTTP request object.
-        pk (int): Primary key of the article.
+        pk (int): Article primary key.
 
     Returns:
         HttpResponse: Rendered article edit form or redirect on success.
@@ -223,15 +207,10 @@ def editor_article_edit(request, pk):
             return redirect("articles:editor_list")
     else:
         form = ArticleForm(instance=article)
-    return render(
-        request,
-        "articles/editor_article_edit.html",
-        {"form": form, "article": article},
-    )
+    return render(request, "articles/editor_article_edit.html", {"form": form, "article": article})
 
 
 # ---------------------------- Reader Views ----------------------------
-
 
 @login_required
 def reader_article_list(request):
@@ -255,8 +234,8 @@ def reader_article_list(request):
     ).values_list("journalist_id", flat=True)
     articles = (
         Article.objects.filter(
-            Q(publisher__id__in=subscriptions_pub)
-            | Q(author__id__in=subscriptions_jour),
+            Q(publisher__id__in=subscriptions_pub) |
+            Q(author__id__in=subscriptions_jour),
             is_approved=True,
         )
         .distinct()
@@ -272,7 +251,7 @@ def reader_article_detail(request, pk):
 
     Args:
         request (HttpRequest): HTTP request object.
-        pk (int): Primary key of the article.
+        pk (int): Article primary key.
 
     Returns:
         HttpResponse: Rendered article detail page.
@@ -289,7 +268,7 @@ def article_detail(request, pk):
 
     Args:
         request (HttpRequest): HTTP request object.
-        pk (int): Primary key of the article.
+        pk (int): Article primary key.
 
     Returns:
         HttpResponse: Rendered article detail page.
@@ -299,7 +278,6 @@ def article_detail(request, pk):
 
 
 # ---------------------------- Journalist Views ----------------------------
-
 
 def journalist_article_create(request):
     """
@@ -340,9 +318,7 @@ def journalist_article_list(request):
         raise PermissionDenied()
 
     articles = Article.objects.filter(author=request.user).order_by("-created_at")
-    return render(
-        request, "articles/journalist_article_list.html", {"articles": articles}
-    )
+    return render(request, "articles/journalist_article_list.html", {"articles": articles})
 
 
 def journalist_article_edit(request, pk):
@@ -351,7 +327,7 @@ def journalist_article_edit(request, pk):
 
     Args:
         request (HttpRequest): HTTP request object.
-        pk (int): Primary key of the article.
+        pk (int): Article primary key.
 
     Returns:
         HttpResponse: Rendered article edit form or redirect on success.
@@ -373,7 +349,7 @@ def journalist_article_delete(request, pk):
 
     Args:
         request (HttpRequest): HTTP request object.
-        pk (int): Primary key of the article.
+        pk (int): Article primary key.
 
     Returns:
         HttpResponse: Redirect to journalist article list after deletion.

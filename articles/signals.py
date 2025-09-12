@@ -1,3 +1,14 @@
+"""
+articles.signals
+
+Signals module for the Articles app.
+
+Handles post-save signals for Article and Newsletter models.
+Sends notifications to subscribers via email and optionally posts updates
+to Twitter. Includes utility functions for Twitter client authentication
+and notification logic.
+"""
+
 import os
 
 import tweepy
@@ -11,14 +22,6 @@ from newsletters.models import Newsletter
 from subscriptions.models import Subscription
 
 from .models import Article
-
-"""
-Signals module for the Articles app.
-
-Handles post-save signals for Article and Newsletter models.
-Sends notifications to subscribers via email and optionally posts updates to Twitter.
-Includes utility functions for Twitter client authentication and notification logic.
-"""
 
 
 def get_twitter_client():

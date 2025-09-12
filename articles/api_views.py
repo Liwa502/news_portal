@@ -1,3 +1,12 @@
+"""
+articles.api
+
+API views for articles and newsletters.
+
+Provides REST API endpoints for retrieving articles and newsletters
+based on user subscriptions and roles (reader, journalist, editor).
+"""
+
 from django.db.models import Q
 from rest_framework import generics, permissions
 
@@ -6,13 +15,6 @@ from subscriptions.models import Subscription
 
 from .models import Article
 from .serializers import ArticleSerializer, NewsletterSerializer
-
-"""
-API views for articles and newsletters.
-
-Provides REST API endpoints for retrieving articles and newsletters
-based on user subscriptions and roles (reader, journalist, editor).
-"""
 
 
 class SubscriberArticlesAPI(generics.ListAPIView):

@@ -1,5 +1,5 @@
 """
-Models for the subscriptions app.
+Models for the Subscriptions app.
 
 Defines user subscriptions to publishers or journalists.
 """
@@ -54,10 +54,7 @@ class Subscription(models.Model):
         Return a human-readable representation of the subscription.
         """
         if self.publisher:
-            return (
-                f"{self.user.username} subscribes to publisher "
-                f"{self.publisher.name}"
-            )
+            return f"{self.user.username} subscribes to publisher {self.publisher.name}"
         if self.journalist:
             return (
                 f"{self.user.username} subscribes to journalist "

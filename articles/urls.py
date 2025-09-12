@@ -1,9 +1,7 @@
-from django.urls import path
-
-from . import api_views, views
-
 """
-URL configuration for the articles app.
+articles.urls
+
+URL configuration for the Articles app.
 
 Defines routes for:
 - Reader views
@@ -12,6 +10,10 @@ Defines routes for:
 - Publisher creation
 - API endpoints for subscriber articles and newsletters
 """
+
+from django.urls import path
+
+from . import api_views, views
 
 app_name = "articles"
 

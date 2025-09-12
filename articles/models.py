@@ -1,13 +1,15 @@
-from django.conf import settings
-from django.db import models
-
 """
+articles.models
+
 Models module for the Articles app.
 
 Defines Publisher, Article, and Journalist models with their fields,
 relationships, and string representations. Supports editor/journalist
 assignments and article management.
 """
+
+from django.conf import settings
+from django.db import models
 
 
 # ----------------------------

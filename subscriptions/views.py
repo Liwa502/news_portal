@@ -8,7 +8,6 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect
 
 from articles.models import Journalist, Publisher
-
 from .models import Subscription
 
 
@@ -18,14 +17,14 @@ def subscribe_publisher(request, pk):
     Subscribe the authenticated reader to a publisher.
 
     Args:
-        request: HttpRequest object.
+        request (HttpRequest): HTTP request object.
         pk (int): Publisher primary key.
 
     Raises:
         PermissionDenied: If the user is not a reader.
 
     Returns:
-        HttpResponseRedirect to the home page with a success message.
+        HttpResponseRedirect: Redirects to home with a success message.
     """
     if request.user.role != "reader":
         raise PermissionDenied()
@@ -42,14 +41,14 @@ def unsubscribe_publisher(request, pk):
     Unsubscribe the authenticated reader from a publisher.
 
     Args:
-        request: HttpRequest object.
+        request (HttpRequest): HTTP request object.
         pk (int): Publisher primary key.
 
     Raises:
         PermissionDenied: If the user is not a reader.
 
     Returns:
-        HttpResponseRedirect to the home page with a success message.
+        HttpResponseRedirect: Redirects to home with a success message.
     """
     if request.user.role != "reader":
         raise PermissionDenied()
@@ -66,14 +65,14 @@ def subscribe_journalist(request, pk):
     Subscribe the authenticated reader to a journalist.
 
     Args:
-        request: HttpRequest object.
+        request (HttpRequest): HTTP request object.
         pk (int): Journalist primary key.
 
     Raises:
         PermissionDenied: If the user is not a reader.
 
     Returns:
-        HttpResponseRedirect to the home page with a success message.
+        HttpResponseRedirect: Redirects to home with a success message.
     """
     if request.user.role != "reader":
         raise PermissionDenied()
@@ -90,14 +89,14 @@ def unsubscribe_journalist(request, pk):
     Unsubscribe the authenticated reader from a journalist.
 
     Args:
-        request: HttpRequest object.
+        request (HttpRequest): HTTP request object.
         pk (int): Journalist primary key.
 
     Raises:
         PermissionDenied: If the user is not a reader.
 
     Returns:
-        HttpResponseRedirect to the home page with a success message.
+        HttpResponseRedirect: Redirects to home with a success message.
     """
     if request.user.role != "reader":
         raise PermissionDenied()
