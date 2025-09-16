@@ -17,19 +17,16 @@ from django.db import models
 # ----------------------------
 class Publisher(models.Model):
     """
-    Publisher model representing a publishing entity.
+    Represents a publishing entity.
 
     Can have multiple editors and journalists assigned. Editors and journalists
     are linked to the CustomUser model.
 
     Attributes:
         name (CharField): Name of the publisher.
-        editors (ManyToManyField): Users with editor role associated with this
-            publisher.
-        journalists (ManyToManyField): Users with journalist role associated with
-            this publisher.
+        editors (ManyToManyField): Users with editor role associated with this publisher.
+        journalists (ManyToManyField): Users with journalist role associated with this publisher.
     """
-
     name = models.CharField(max_length=255)
     editors = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name="editor_publishers", blank=True
@@ -39,7 +36,7 @@ class Publisher(models.Model):
     )
 
     def __str__(self):
-        """Return a string representation of the Publisher."""
+        """String representation."""
         return self.name
 
 
@@ -48,7 +45,7 @@ class Publisher(models.Model):
 # ----------------------------
 class Article(models.Model):
     """
-    Article model representing a news article.
+    Represents a news article.
 
     Each article belongs to a publisher and is authored by a user. Can be
     approved or pending approval.
@@ -62,7 +59,6 @@ class Article(models.Model):
         created_at (DateTimeField): Timestamp when the article was created.
         updated_at (DateTimeField): Timestamp when the article was last updated.
     """
-
     title = models.CharField(max_length=255)
     content = models.TextField()
     publisher = models.ForeignKey(
@@ -76,7 +72,7 @@ class Article(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        """Return a string representation of the Article."""
+        """String representation."""
         return self.title
 
 
@@ -85,16 +81,15 @@ class Article(models.Model):
 # ----------------------------
 class Journalist(models.Model):
     """
-    Journalist model linking additional info to a user.
+    Links additional info to a user.
 
     Each journalist is linked one-to-one with a CustomUser instance.
 
     Attributes:
         user (OneToOneField): User associated with this journalist profile.
     """
-
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):
-        """Return a string representation of the Journalist."""
+        """String representation."""
         return self.user.username

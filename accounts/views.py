@@ -3,7 +3,7 @@ accounts.views
 
 Views module for the Accounts app.
 
-Contains views for user registration, login, and logout.
+Provides user registration, login, and logout functionality.
 Handles authentication, user creation, and related messages.
 """
 
@@ -20,16 +20,18 @@ def register(request):
     """
     Handle user registration.
 
-    GET: Display the registration form.
-    POST: Validate the form, check for duplicate usernames,
-          create a new user with the selected role, and redirect to login.
+    GET:
+        Display the registration form.
+    POST:
+        Validate the form, check for duplicate usernames,
+        create a new user with the selected role, and redirect to login.
 
     Args:
         request (HttpRequest): The HTTP request object.
 
     Returns:
-        HttpResponse: Rendered registration page with the form or
-                      redirect to login on successful registration.
+        HttpResponse: Rendered registration page with the form, or
+        redirect to login on successful registration.
     """
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST)
@@ -59,9 +61,11 @@ def user_login(request):
     """
     Handle user login.
 
-    GET: Display the login form.
-    POST: Authenticate the user with provided credentials and
-          log them in if valid, then redirect to the articles home page.
+    GET:
+        Display the login form.
+    POST:
+        Authenticate the user with provided credentials and
+        log them in if valid, then redirect to the articles home page.
 
     Args:
         request (HttpRequest): The HTTP request object.

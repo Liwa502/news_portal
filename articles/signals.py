@@ -10,7 +10,6 @@ and notification logic.
 """
 
 import os
-
 import tweepy
 from django.conf import settings
 from django.core.mail import send_mail
@@ -20,13 +19,12 @@ from django.dispatch import receiver
 from accounts.models import CustomUser
 from newsletters.models import Newsletter
 from subscriptions.models import Subscription
-
 from .models import Article
 
 
 def get_twitter_client():
     """
-    Returns an authenticated Tweepy client if environment variables are set.
+    Return an authenticated Tweepy client if environment variables are set.
 
     Checks the TWITTER_ENABLED environment variable. If not enabled or
     authentication fails, returns None.
@@ -54,8 +52,8 @@ def notify_subscribers_and_twitter(publisher, journalist, title, content):
     Notify all subscribers via email and optionally post the update to Twitter.
 
     Subscribers can follow either:
-      - A publisher (organization)
-      - A journalist (specific author)
+        - A publisher (organization)
+        - A journalist (specific author)
 
     Args:
         publisher (Publisher): Publisher instance of the article/newsletter.
@@ -115,7 +113,7 @@ def article_approved_handler(sender, instance, created, **kwargs):
         sender (Model): The model class.
         instance (Article): The saved article instance.
         created (bool): Whether the instance was created.
-        **kwargs: Additional keyword arguments.
+        `**kwargs`: Additional keyword arguments.
     """
     if instance.is_approved:
         journalist_instance = (
@@ -143,7 +141,7 @@ def newsletter_approved_handler(sender, instance, created, **kwargs):
         sender (Model): The model class.
         instance (Newsletter): The saved newsletter instance.
         created (bool): Whether the instance was created.
-        **kwargs: Additional keyword arguments.
+        `**kwargs`: Additional keyword arguments.
     """
     if instance.is_approved:
         journalist_instance = (
