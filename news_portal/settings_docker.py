@@ -1,4 +1,6 @@
+import os
 from .settings import *
+from .settings import BASE_DIR
 
 # ----------------------------
 # Database Configuration
@@ -8,13 +10,18 @@ from .settings import *
 # and testing purposes. For production, a more robust database like
 # PostgreSQL or MySQL is recommended.
 
-DATABASES = {
-    'default': {
-        # ENGINE specifies the backend database engine to use.
-        'ENGINE': 'django.db.backends.sqlite3',
+RUNNING_IN_DOCKER = True
 
-        # NAME specifies the path to the database file.
-        # Using BASE_DIR / "db.sqlite3" stores the file in the project root.
-        'NAME': BASE_DIR / "db.sqlite3",
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.getenv("MYSQL_DB", "news_portal"),
+        "USER": os.getenv("MYSQL_USER", "user1"),
+        "PASSWORD": os.getenv("DB_PASSWORD", "StrongPassword123"),
+        "HOST": os.getenv("DOCKER_DB_HOST", "db"),
+        "PORT": os.getenv("DB_PORT", "3306"),
+        "OPTIONS": {
+            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
 }

@@ -20,12 +20,16 @@ COPY requirements.txt /app/
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the project
+# Copy project files
 COPY . /app/
 
-# Expose Django default port
+# Copy wait-for-db script and make it executable
+COPY wait-for-db.sh /app/
+RUN chmod +x /app/wait-for-db.sh
+
+# Expose Django port
 EXPOSE 8000
 
-# Run migrations and start the server
-CMD ["sh", "-c", "python manage.py migrate --settings=news_portal.settings_docker --noinput && python manage.py runserver 0.0.0.0:8000 --settings=news_portal.settings_docker"]
+# Run server, waiting for DB
+CMD ["sh", "/app/wait-for-db.sh", "db", "sh", "-c", "python manage.py migrate --settings=news_portal.settings_docker --noinput && python manage.py runserver 0.0.0.0:8000 --settings=news_portal.settings_docker"]
 

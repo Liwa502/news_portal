@@ -24,12 +24,13 @@ load_dotenv()  # loads the .env file
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-ucyk2$$tt43+7s11)f(a^u!lujv82s$o5#*z$)85pj+%#9y6z4"
+SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "True") in ["1", "True", "true"]
 
-ALLOWED_HOSTS = []
+
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 
 # Application definition
@@ -82,14 +83,16 @@ WSGI_APPLICATION = "news_portal.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+RUNNING_IN_DOCKER = os.getenv("RUNNING_IN_DOCKER", "0") == "1"
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "news_portal",
-        "USER": "user1",
+        "NAME": os.getenv("MYSQL_DB"),
+        "USER": os.getenv("MYSQL_USER"),
         "PASSWORD": os.getenv("DB_PASSWORD", "StrongPassword123"),
-        "HOST": "127.0.0.1",
-        "PORT": "3306",
+        "HOST": os.getenv("DOCKER_DB_HOST" if RUNNING_IN_DOCKER else "LOCAL_DB_HOST", "127.0.0.1"),
+        "PORT": os.getenv("DB_PORT", "3306"),
         "OPTIONS": {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
         },
@@ -139,6 +142,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

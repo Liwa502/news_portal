@@ -1,0 +1,30 @@
+services:
+  db:
+    image: mariadb:latest
+    container_name: news_portal-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: news_portal
+      MYSQL_USER: user1
+      MYSQL_PASSWORD: StrongPassword123
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - news_portal_db_data:/var/lib/mysql
+
+  app:
+    build: .
+    container_name: news_portal-app
+    environment:
+      - RUNNING_IN_DOCKER=1
+    command: sh /app/wait-for-db.sh db python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+
+volumes:
+  news_portal_db_data:
