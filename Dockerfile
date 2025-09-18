@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 # Install system dependencies for mariadb/mysqlclient
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y bash \
     build-essential \
     default-libmysqlclient-dev \
     mariadb-client \

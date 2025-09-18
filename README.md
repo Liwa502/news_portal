@@ -35,65 +35,38 @@ DB_PASSWORD=StrongPassword123
 DB_HOST=db
 DB_PORT=3306
 
-## 💻 Local Development (venv)
+# Clone the repo
+git clone <your-repo-url> news_portal
+cd news_portal
+
+# -----------------------
+# Option 1: Local venv
+# -----------------------
 python -m venv venv
 # Windows
 venv\Scripts\activate
 # macOS / Linux
-source venv/bin/activate
+# source venv/bin/activate
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
-# Access app at http://127.0.0.1:8000/
+# Open browser at http://localhost:8000 or http://127.0.0.1:8000
+# ❌ Do NOT use http://0.0.0.0:8000
 
-## 🐳 Docker Development (MariaDB + Django)
-# Build and start containers in detached mode
+# -----------------------
+# Option 2: Docker
+# -----------------------
 docker compose up -d --build
-# Check containers
-docker compose ps
-# Apply migrations
 docker compose exec app python manage.py migrate
-# Watch logs / server output
+# Open browser at http://localhost:8000 or http://127.0.0.1:8000
 docker compose logs -f app
-# Access app at http://localhost:8000
 # Stop containers when done
 docker compose down
-# Stop & remove containers + DB volume (reset)
+# Optional: reset DB + containers
 docker compose down -v
 
-## Docker Compose Example
-services:
-  db:
-    image: mariadb:latest
-    container_name: news_portal-db
-    restart: always
-    environment:
-      MYSQL_DATABASE: news_portal
-      MYSQL_USER: user1
-      MYSQL_PASSWORD: StrongPassword123
-      MYSQL_ROOT_PASSWORD: rootpassword
-    ports:
-      - '3306:3306'
-    volumes:
-      - news_portal_db_data:/var/lib/mysql
-
-  app:
-    build: .
-    container_name: news_portal-app
-    command: sh /app/wait-for-db.sh db python manage.py runserver 0.0.0.0:8000
-    ports:
-      - '8000:8000'
-    depends_on:
-      db:
-        condition: service_healthy
-    volumes:
-      - .:/app
-
-volumes:
-  news_portal_db_data:
-
 ## wait-for-db.sh Script
-#!/bin/sh
+#!/bin/bash
 set -e
 host="$1"
 shift
